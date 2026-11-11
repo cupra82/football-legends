@@ -1,8 +1,8 @@
 {
   "name": "football-legends",
-  "version": "1.3.3",
+  "version": "2.0.0",
   "private": true,
-  "description": "Football Legends 1.3.3 — Primeira Liga portoghese, leggende, multiplayer, classifiche persistenti",
+  "description": "Football Legends 2.0 \u2014 quiz storico, grandi club, campioni, premi e classifiche verificate senza risultati casuali",
   "scripts": {
     "start": "node server.js"
   },

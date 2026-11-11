@@ -1,31 +1,18 @@
-# Football Legends 1.3.3 — Primeira Liga portoghese
+# Football Legends 2.0 — Almanacco divertente
 
-## Novità
+**Focus:** Mondiali, EURO, Champions, stadi famosi, derby, leggende, allenatori, Pallone d’Oro e campionati europei. Sempre tre scelte.
 
-- Nuova categoria selezionabile **Primeira Liga portoghese**.
-- **99 domande curate**, sempre con **3 risposte**, su club, campioni, calciatori, allenatori e competizioni.
-- Non sono generate domande su gol in partite casuali o risultati all'intervallo.
-- Conservati server multiplayer, nickname, database PostgreSQL, classifiche e archivio delle domande.
-- La nuova categoria è selezionabile in Carriera solitaria e Arena online.
-- `/api/status` mostrerà la nuova voce `Primeira Liga portoghese` con 99 quesiti.
+- `classics-questions.json`: 156 domande curate, incluse nella selezione server.
+- `people-questions.json`, `portugal-questions.json`, `questions.json`: archivio storico precedente.
+- `people-generated.json`: profili da archivio biografico (se presenti nel repository).
+- `questions-generated.json`: domande su campionati (rigenerate dal lunedì, solo classifiche complete).
+- `football-bank.js`: genera domande su prime posizioni, senza risultati/gol di partite casuali.
+- `server.js`: seleziona le domande miste bilanciando argomenti, con massimo circa 25% di nazionalità/ruolo/epoca quando la scelta è “Tutte”.
+- `index.html`: applica lo stesso criterio alla carriera solitaria.
 
-## Installazione
+## Aggiornamento
+1. GitHub Desktop → Fetch/Pull (quando necessario) → copia i file → Commit → Push origin.
+2. GitHub Actions → Aggiorna archivio Football Legends → Run workflow per rigenerare subito, senza attendere lunedì.
+3. Verifica `/api/version` e `/api/status`. **Non eliminare i JSON generati esistenti prima della prima rigenerazione riuscita.**
 
-1. Su GitHub Desktop esegui **Fetch origin** e **Pull origin** se disponibile.
-2. Estrai questo ZIP e copia tutto il suo contenuto nella cartella locale del repository, sostituendo i file esistenti senza cancellare i file non presenti nello ZIP.
-3. **Non cancellare** `questions-generated.json` e `people-generated.json`, perché questi due file vengono creati da GitHub Actions e possono non essere presenti nello ZIP.
-4. In GitHub Desktop: **Commit to main → Push origin**.
-5. Non serve eseguire **Run workflow**: le 99 domande portoghesi sono già incluse nel nuovo file `portugal-questions.json`.
-6. Verifica che Render sia Live e apri `/api/version` (atteso `1.3.3`) e `/api/status` (categoria `Primeira Liga portoghese`).
-7. Forza il refresh nel browser con Ctrl+Shift+R.
-
-## Fonti principali
-
-- RSSSF albo d'oro: https://rsssf.org/tablesp/portchamp.html
-- UEFA club portoghesi: https://pt.uefa.com/uefachampionsleague/news/023d-0e97b175ee2d-090504adece2-1000--palmares-na-uefa-clubes-com-mais-titulos/
-- UEFA Champions Porto 2004: https://www.uefa.com/uefachampionsleague/news/0250-0c50f100f076-ecb0d9d85bb1-1000--2003-04-porto-pull-off-biggest-surprise/
-- UEFA storia Porto: https://www.uefa.com/uefachampionsleague/news/025a-0eaae2d4aef0-8d3790dac4c0--raise-a-glass-to-porto/
-- UEFA calciatori portoghesi: https://www.uefa.com/news/0246-0e98e228fe16-d5ff2a10c737-1000--europe-s-top-portuguese-players/
-- Primeira Liga marcatori: https://futebol.pt/recordes/melhores-marcadores-liga/
-
-Le domande stagionali arrivano fino alla stagione 2025/26 conclusa. La stagione 2026/27 non è ancora conclusa.
+Le 156 domande aggiuntive sono dati storici stabili; gli aggiornamenti del lunedì non garantiscono nuove domande se le fonti non sono cambiate. Non sono stati verificati qui i download remoti del workflow.
