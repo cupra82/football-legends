@@ -40,6 +40,18 @@ async function register(candidate){
 async function authenticate(token){if(!ready||typeof token!=='string'||!/^[0-9a-f]{64}$/i.test(token))return null;
  const r=await pool.query('SELECT id,nickname FROM fl_accounts WHERE token_hash=$1',[digest(token.toLowerCase())]);return r.rows[0]||null;
 }
+// Il token di sessione viene verificato direttamente dal DB. Una nuova rotazione
+// sostituisce in modo atomico salt e hash del codice precedente.
+async function rotateRecovery(token){
+ if(!ready)throw Error('Database non disponibile. Riprova più tardi.');
+ if(typeof token!=='string'||!/^[0-9a-f]{64}$/i.test(token))throw Error('Sessione non valida. Recupera il profilo.');
+ const recovery=recoveryCode(),salt=crypto.randomBytes(16).toString('hex');
+ const r=await pool.query(`UPDATE fl_accounts SET recovery_salt=$1, recovery_hash=$2
+   WHERE token_hash=$3 RETURNING id,nickname`,
+   [salt,recoveryDigest(recovery,salt),digest(token.toLowerCase())]);
+ if(!r.rowCount)throw Error('Sessione non valida. Recupera il profilo.');
+ return {id:r.rows[0].id,nickname:r.rows[0].nickname,recovery};
+}
 async function recover(candidate,code){
  if(!ready)throw Error('Recupero non disponibile.');
  const nickname=validateName(candidate),r=await pool.query('SELECT * FROM fl_accounts WHERE nickname_key=$1',[nickname.toLocaleLowerCase('und')]);
@@ -51,4 +63,4 @@ async function recover(candidate,code){
  const token=randomToken();await pool.query('UPDATE fl_accounts SET token_hash=$1 WHERE id=$2',[digest(token),user.id]);
  return {id:user.id,nickname:user.nickname,token};
 }
-module.exports={init,status,register,authenticate,recover};
+module.exports={init,status,register,authenticate,recover,rotateRecovery};

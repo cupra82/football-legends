@@ -38,6 +38,7 @@ async function accountRequest(req,res,pathname){
  let raw='';try{for await(const chunk of req){raw+=chunk;if(raw.length>4096)throw Error('Richiesta troppo grande')}const x=JSON.parse(raw||'{}');
   if(pathname==='/api/account/register')return jsonReply(res,200,await accounts.register(x.nickname));
   if(pathname==='/api/account/recover')return jsonReply(res,200,await accounts.recover(x.nickname,x.code));
+  if(pathname==='/api/account/rotate-recovery')return jsonReply(res,200,await accounts.rotateRecovery(x.token));
   if(pathname==='/api/account/me'){const acc=await accounts.authenticate(x.token);return acc?jsonReply(res,200,acc):jsonReply(res,401,{error:'Sessione non valida. Recupera il profilo.'})}
  }catch(e){return jsonReply(res,400,{error:e.message})}
 }
@@ -54,7 +55,7 @@ const httpServer=http.createServer((req,res)=>{
  }
  if(pathname==='/api/leaderboard/status'){res.writeHead(200,{'Content-Type':'application/json; charset=utf-8','Cache-Control':'no-store'});return res.end(JSON.stringify(ranking.status()))}
  if(pathname==='/api/leaderboard'){res.writeHead(200,{'Content-Type':'application/json; charset=utf-8','Cache-Control':'no-store'});return ranking.leaderboard(30).then(rows=>res.end(JSON.stringify({status:ranking.status(),players:rows}))).catch(e=>res.end(JSON.stringify({status:{...ranking.status(),ready:false},players:[]})))}
- if(pathname==='/api/version'){res.writeHead(200,{'Content-Type':'application/json; charset=utf-8','Cache-Control':'no-store'});return res.end(JSON.stringify({version:'1.3.0',game:'Football Legends',state:bankStatus.state,questions:bankStatus.count}))}
+ if(pathname==='/api/version'){res.writeHead(200,{'Content-Type':'application/json; charset=utf-8','Cache-Control':'no-store'});return res.end(JSON.stringify({version:'1.3.2',game:'Football Legends',state:bankStatus.state,questions:bankStatus.count}))}
  if(pathname==='/api/status'){res.writeHead(200,{'Content-Type':'application/json; charset=utf-8','Cache-Control':'no-store'});return res.end(JSON.stringify(bankStatus))}
  if(pathname!=='/'&&pathname!=='/index.html'){res.writeHead(404);return res.end('Not found')}
  const data=fs.readFileSync(path.join(__dirname,'index.html'));res.writeHead(200,{'Content-Type':'text/html; charset=utf-8','Cache-Control':'no-store'});res.end(data)
