@@ -1,0 +1,32 @@
+FOOTBALL LEGENDS v1.3.1 — HOTFIX CREAZIONE STANZA
+
+PROBLEMA RISOLTO:
+- Il frontend 1.3 invocava elementi HTML assenti (accountState, recoverPanel,
+  recoverNick, recoverCode, newRecoveryPanel e newRecoveryCode).
+- Se la registrazione nickname restituiva HTTP 400, il codice tentava di scrivere
+  su un elemento inesistente e il pulsante "Crea stanza" sembrava non fare nulla.
+
+MODIFICHE:
+- Aggiunta area stato account, recupero nickname e presentazione codice recupero.
+- Visualizzazione leggibile degli errori dal server.
+- Se il nickname è già usato, apertura del pannello di recupero.
+- Corretto il testo versione nell'header a 1.3.1 (solo frontend).
+
+INSTALLAZIONE:
+1. GitHub Desktop > Fetch origin / Pull origin se necessario.
+2. Repository > Show in Explorer.
+3. Sostituire SOLO il file index.html nella radice del repository.
+4. Commit to main > Push origin.
+5. Attendere il deploy Live su Render, aprire il gioco e fare CTRL+SHIFT+R.
+6. Se il nickname è già preso, usarne un altro oppure recuperarlo con il
+   codice personale precedentemente salvato.
+
+NON SOSTITUIRE server.js, accounts-store.js, questions-generated.json,
+people-generated.json o altre risorse. NON serve Run workflow.
+
+NOTE:
+- Il server continuerà a indicare 1.3.0 in /api/version finché non aggiornerai
+  anche il valore lato server: questo hotfix cambia solo la pagina HTML.
+- La registrazione usa il database già collegato a Render (DATABASE_URL).
+- Test eseguito: verifica sintattica JavaScript e presenza degli ID richiesti.
+- Collaudo sul server pubblico da fare dopo il deploy.
