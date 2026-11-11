@@ -1,30 +1,26 @@
-# Football Legends v0.6 — Calcio svizzero completo (upgrade compatibile)
+# FOOTBALL LEGENDS v0.8 — PACCHETTO COMPLETO
 
-La release **mantiene 50.000 domande generate + le 131 originali**, senza cambiare le regole di gioco, l'interfaccia o il server multiplayer.
+Questo pacchetto contiene **il progetto completo** per il server Render e per GitHub, NON il file delle 50.000 domande generate. Il file `questions-generated.json` che GitHub Actions ha già creato rimane nel repository quando si copiano i file sopra quelli esistenti. **Non cancellarlo**.
 
-## Cosa aggiunge
+## Cosa include
+- Carriera solitaria e duello: 10, 15, 20, 30 domande.
+- Arena online: selezione 10, 15, 20, 30 domande **prima di creare la stanza**, modificabile dall'host anche nella lobby.
+- Server WebSocket con tempo e opzioni controllati sul server, fino a 8 giocatori.
+- Generatore 50.000 domande con riserva per Super League svizzera, Challenge League e Coppa Svizzera dove disponibili.
+- `scripts/build-bank.js` e `.github/workflows/update-questions.yml` per aggiornare `questions-generated.json`.
 
-- **Super League svizzera**: 6 stagioni OpenFootball disponibili (2014/15, 2018/19, 2019/20, 2020/21, 2023/24, 2024/25). Il generatore riserva fino a **5.000** domande alla categoria `Campionato svizzero`, se i dati bastano.
-- **Challenge League svizzera**: 2019/20, 2020/21, 2023/24, 2024/25 (fino a 1.200 domande dedicate).
-- **Coppa Svizzera**: 2023/24 e 2024/25 (fino a 500 domande dedicate). Include partite di FC Mendrisio, AC Bellinzona, FC Lugano e altre squadre ticinesi ove presenti nell'archivio.
-- Fonti CC0: https://openfootball.github.io/europe/ (URL dei JSON verificati).
-- Tre risposte per domanda, con spiegazione e fonte. Nessun risultato inventato.
+## Installazione su GitHub Desktop
+1. In GitHub Desktop: **Fetch origin**, poi **Pull origin** se disponibile. NON forzare se compaiono conflitti.
+2. Repository > Show in Explorer. Aprire questa cartella, copiare **tutti i file e le sottocartelle contenuti in questo pacchetto** nella cartella del repository. **Non eliminare i file già presenti**.
+3. GitHub Desktop: Commit to main > Push origin. Se segnala modifiche remote, Fetch > Pull > Push e risolvi eventuali conflitti.
+4. GitHub Actions > Aggiorna archivio Football Legends > Run workflow, branch main.
+5. Verificare che il log mostri fonti svizzere: in `/api/status`, nel campo `stats.byCategory`, cercare `Campionato svizzero`, `Challenge League svizzera`, `Coppa Svizzera`.
+6. Render deve completare il deploy `Live`; aprire il sito con Ctrl+F5 per aggiornare la cache.
 
-**Importante:** `5.000` è la quota *massima riservata*, non il numero garantito. Alcune competizioni o stagioni possono essere incomplete; i conteggi reali vengono mostrati da `/api/status` dopo l'esecuzione del workflow. Il dato 2026/27 non è ancora coperto da queste fonti. Le statistiche stagionali nel quiz si riferiscono alle sole partite registrate, non necessariamente a una classifica ufficiale.
+## Verifica in Arena
+Nel sito aprire Arena online: il campo `Numero di domande Arena online` deve essere visibile subito. Scegliere 30, creare stanza, entrare da un secondo dispositivo e avviare. In alto la partita deve mostrare `DOMANDA 1 / 30`.
 
-## Installazione sicura sul progetto Render esistente
+## Chiarimenti sui numeri
+Il totale 50.131 è corretto per la banca generata 50.000 + 131 originali. Le domande svizzere **sostituiscono** altre domande nella quota delle 50.000: il totale può rimanere 50.131 anche quando quelle svizzere sono state aggiunte. Bisogna guardare `stats.byCategory`, non solo `count`. **Non è garantito** che siano esattamente 5.000 svizzere: dipende dalle fonti disponibili.
 
-1. Da GitHub Desktop apri **Repository → Show in Explorer**. Copia **soltanto `football-bank.js`** dal nuovo ZIP nella cartella del repository, sostituendo quello già presente. Gli altri file del progetto NON devono essere sovrascritti.
-2. GitHub Desktop: **Commit to main** poi **Push origin**. Render può fare un deploy automatico, ma continuerà a usare il vecchio archivio finché non viene rigenerato il JSON.
-3. GitHub web → **Actions** → **Aggiorna archivio Football Legends** → **Run workflow** (branch `main`).
-4. Dopo il workflow verde, verifica che il file `questions-generated.json` abbia un commit aggiornato; Render dovrebbe ridistribuire automaticamente il gioco (se Auto Deploy è attivo).
-5. Apri https://football-legends-okp1.onrender.com/api/status e verifica `state: ready`, `count`, `byCategory["Campionato svizzero"]`, `byCategory["Challenge League svizzera"]` e `byCategory["Coppa Svizzera"]`.
-6. Prova il single player e poi una stanza multiplayer con due dispositivi.
-
-## Verifiche locali
-
-`node test-bank.js` non richiede Internet. `node scripts/build-bank.js` richiede accesso a Internet e può aggiornare il database; GitHub Actions lo fa senza usare il tuo PC.
-
-## Limitazioni
-
-Il nuovo archivio contiene soprattutto domande su risultati, gol e statistiche calcolate. Non include ancora una banca dati completa di giocatori, allenatori e albi d'oro svizzeri. Questo aggiornamento conserva la struttura precedente e non modifica la gestione delle stanze.
+Fonti: OpenFootball (CC0), https://openfootball.github.io/europe/ e https://github.com/openfootball/football.json
