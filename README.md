@@ -21,3 +21,10 @@ Le 156 domande aggiuntive sono dati storici stabili; gli aggiornamenti del luned
 ## v2.1.2
 - categorie riordinate: campionati, coppe, altri argomenti
 - foto differenziate per Allenatori e tecnici, Calciatori leggendari, Leggende, Curiosità, Europei, Nazionali, Europa/UEFA
+
+
+## v2.1.5 - Foto sistemate
+- Calciatori nel mondo aggiornati
+- Calciatori leggendari aggiornati
+- Allenatori storici aggiornati con immagine dedicata
+- Calcio femminile con immagine dedicata
