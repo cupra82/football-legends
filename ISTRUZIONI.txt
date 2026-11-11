@@ -1,13 +1,12 @@
-FOOTBALL LEGENDS — Pubblicazione gratuita su GitHub + Render (novembre 2026)
+FOOTBALL LEGENDS 2.1.6 — RIPRISTINO FOTO
 
-1. Apri https://github.com e registrati/accedi.
-2. Crea un nuovo repository (pulsante + > New repository), nome football-legends. Scegli Private se vuoi limitare l'accesso al codice; Render dovra' essere autorizzato ad accedervi.
-3. Apri il repository > Add file > Upload files.
-4. Estrai questo archivio ZIP sul computer. Trascina nel caricamento I FILE contenuti, non lo ZIP e non la cartella: index.html, server.js, package.json, questions.json, render.yaml (ISTRUZIONI.txt opzionale). Premi Commit changes.
-5. Vai su https://dashboard.render.com e accedi con GitHub, autorizzando l'accesso al repository.
-6. Click New > Web Service; scegli il repository football-legends.
-7. Imposta: Name football-legends (se disponibile); Language Node; Branch main; Root Directory vuota; Build Command npm install; Start Command npm start; Instance Type Free. Se Render rileva render.yaml puoi usare anche la configurazione guidata Blueprint, ma Web Service va bene.
-8. Premi Deploy Web Service / Create Web Service. Attendi lo stato Live, apri l'indirizzo HTTPS indicato da Render.
-9. Ogni giocatore apre LO STESSO link sul proprio telefono o computer. In Arena online inserisce il soprannome (campo server vuoto), una persona fa Crea stanza e invia agli altri il codice. Gli altri fanno Entra. Il creatore avvia la partita.
+1. Estrai lo ZIP.
+2. In GitHub Desktop: Repository > Show in Explorer.
+3. Sostituisci SOLO index.html con quello del pacchetto.
+4. Summary: Football Legends 2.1.6 - Fix foto definitive
+5. Commit to main, poi Push origin.
+6. Attendi che Render sia Live e ricarica con CTRL+SHIFT+R.
 
-AVVERTENZE: il piano gratuito va in sospensione dopo 15 minuti inattivi e il riavvio puo' richiedere circa un minuto. Le stanze online vengono perse ai riavvii. Nessun account o salvataggio permanente. Questo e' un prototipo per partite private, non una piattaforma pubblica pronta per grandi numeri.
+Non modificare server.js, assets, database o domande. Non fare Run workflow.
+
+Il file contiene le nuove immagini principali incorporate direttamente nella pagina, senza dipendenza da assets per quelle categorie.
