@@ -12,3 +12,11 @@ const seasons=fromSeason(games,'2023-24','Serie A','src');assert(seasons.length>
 let wc=fromWorldCup({matches:[{team1:'Italy',team2:'France',date:'2006-07-09',score:{ft:[1,1]},goals1:[{name:'Marco Materazzi'}],goals2:[{name:'Zinedine Zidane'}],ground:'Olympiastadion Berlin'}]},2006,'src');assert(wc.length>=4);
 const chosen=combineAndCap([qs,seasons,wc],20);assert.equal(chosen.length,20);
 console.log(`OK: ${qs.length} tipologie match, ${seasons.length} domande statistiche, ${wc.length} domande Mondiali; selezione ${chosen.length}`);
+
+const {SWISS_SEASONS,SWISS_EXTRA_FILES,SWISS_CATEGORY}=require('./football-bank');
+assert.equal(SWISS_SEASONS.length,6);
+assert.equal(SWISS_EXTRA_FILES.length,6);
+assert.equal(SWISS_CATEGORY,'Campionato svizzero');
+const swissGame={team1:'FC Lugano',team2:'FC Basel 1893',date:'2024-08-18',score:{ht:[1,0],ft:[2,1]}};
+assert(fromMatch(swissGame,'2024-25',SWISS_CATEGORY,'openfootball').length>=7);
+console.log('OK: sorgenti svizzere e quiz di prova');

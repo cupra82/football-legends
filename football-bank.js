@@ -10,6 +10,21 @@ const LEAGUES=[
 const WORLD_YEARS=[1930,1934,1938,1950,1954,1958,1962,1966,1970,1974,1978,1982,1986,1990,1994,1998,2002,2006,2010,2014,2018,2022,2026];
 const LEAGUE_ROOT='https://raw.githubusercontent.com/openfootball/football.json/master';
 const WC_ROOT='https://raw.githubusercontent.com/openfootball/worldcup.json/master';
+// Archivi svizzeri CC0 controllati nell'indice pubblico OpenFootball Europe.
+// La disponibilità non implica che siano aggiornati alla stagione 2026/27.
+const SWISS_ROOT='https://openfootball.github.io/europe';
+const SWISS_SEASONS=['2014-15','2018-19','2019-20','2020-21','2023-24','2024-25'];
+const SWISS_CATEGORY='Campionato svizzero';
+const SWISS_CHALLENGE_CATEGORY='Challenge League svizzera';
+const SWISS_CUP_CATEGORY='Coppa Svizzera';
+const SWISS_EXTRA_FILES=[
+ ['2019-20','ch2',SWISS_CHALLENGE_CATEGORY],
+ ['2020-21','ch2',SWISS_CHALLENGE_CATEGORY],
+ ['2023-24','ch2',SWISS_CHALLENGE_CATEGORY],
+ ['2024-25','ch2',SWISS_CHALLENGE_CATEGORY],
+ ['2023-24','chcup',SWISS_CUP_CATEGORY],
+ ['2024-25','chcup',SWISS_CUP_CATEGORY]
+];
 const TODAY=()=>new Date().toISOString().slice(0,10);
 const hash=s=>crypto.createHash('sha256').update(s).digest('hex');
 const seed=s=>parseInt(hash(s).slice(0,8),16);
@@ -82,12 +97,31 @@ function combineAndCap(groups,max=50000){ // Diversità per campionato e tipo, s
 async function generateQuestions(progress=()=>{},settings={}){
  const start=settings.firstSeason||2010,end=settings.lastSeason||2026,max=settings.max||50000;
  const jobs=[];for(let y=start;y<=end;y++)for(const [file,category] of LEAGUES){const season=`${y}-${String((y+1)%100).padStart(2,'0')}`;jobs.push({url:`${LEAGUE_ROOT}/${season}/${file}.json`,season,category,type:'league'})}
+ for(const season of SWISS_SEASONS){
+  jobs.push({url:`${SWISS_ROOT}/switzerland_${season}_ch1.json`,season,category:SWISS_CATEGORY,type:'league'});
+ }
+ for(const [season,division,category] of SWISS_EXTRA_FILES){
+  jobs.push({url:`${SWISS_ROOT}/switzerland_${season}_${division}.json`,season,category,type:division==='chcup'?'cup':'league'});
+ }
  for(const year of WORLD_YEARS)jobs.push({url:`${WC_ROOT}/${year}/worldcup.json`,year,type:'worldcup'});
  let next=0,ok=0,failed=0,matchCount=0;const groups=[],errors=[],bySource={};
- async function worker(){while(next<jobs.length){const job=jobs[next++];try{const data=await getJson(job.url);if(!Array.isArray(data.matches))throw Error('Missing matches');let qs=[];if(job.type==='league'){const matches=data.matches.filter(m=>info(m));matchCount+=matches.length;for(const m of matches)qs.push(...fromMatch(m,job.season,job.category,job.url));qs.push(...fromSeason(matches,job.season,job.category,job.url));qs=combineAndCap([qs],1250)}else{qs=fromWorldCup(data,job.year,job.url);matchCount+=data.matches.filter(m=>info(m)).length}
+ async function worker(){while(next<jobs.length){const job=jobs[next++];try{const data=await getJson(job.url);if(!Array.isArray(data.matches))throw Error('Missing matches');let qs=[];if(job.type==='league'||job.type==='cup'){const matches=data.matches.filter(m=>info(m));matchCount+=matches.length;for(const m of matches)qs.push(...fromMatch(m,job.season,job.category,job.url));if(job.type==='league')qs.push(...fromSeason(matches,job.season,job.category,job.url));qs=combineAndCap([qs],1250)}else{qs=fromWorldCup(data,job.year,job.url);matchCount+=data.matches.filter(m=>info(m)).length}
  if(qs.length){groups.push(qs);ok++;bySource[job.type==='league'?job.category:'Mondiali']= (bySource[job.type==='league'?job.category:'Mondiali']||0)+qs.length;progress({source:job.url,questions:qs.length,processed:ok+failed,total:jobs.length})}else failed++}catch(e){failed++;if(errors.length<25)errors.push(`${job.url}: ${e.message}`)}}}
- await Promise.all(Array.from({length:settings.concurrency||10},()=>worker()));const questions=combineAndCap(groups,max);
+ await Promise.all(Array.from({length:settings.concurrency||10},()=>worker()));// Riserva fino a 5.000 posti alla Super League svizzera senza sacrificare
+ // la possibilità di giocare con tutti gli altri campionati. Se la copertura
+ // disponibile è inferiore, dichiariamo il numero reale senza inventare nulla.
+ const swiss=groups.flat().filter(x=>x.category===SWISS_CATEGORY);
+ const others=groups.flat().filter(x=>x.category!==SWISS_CATEGORY);
+ const swissTarget=Math.min(5000,max);
+ const swissChosen=combineAndCap([swiss],swissTarget);
+ const challenge=others.filter(x=>x.category===SWISS_CHALLENGE_CATEGORY);
+ const cup=others.filter(x=>x.category===SWISS_CUP_CATEGORY);
+ const world=others.filter(x=>x.category!==SWISS_CHALLENGE_CATEGORY&&x.category!==SWISS_CUP_CATEGORY);
+ const challengeChosen=combineAndCap([challenge],Math.min(1200,Math.max(0,max-swissChosen.length)));
+ const cupChosen=combineAndCap([cup],Math.min(500,Math.max(0,max-swissChosen.length-challengeChosen.length)));
+ const otherChosen=combineAndCap([world],Math.max(0,max-swissChosen.length-challengeChosen.length-cupChosen.length));
+ const questions=shuffleDet([...swissChosen,...challengeChosen,...cupChosen,...otherChosen],'swiss-reserved-v06');
  const byCategory={};const byKind={};for(const v of questions){byCategory[v.category]=(byCategory[v.category]||0)+1;byKind[v.kind]=(byKind[v.kind]||0)+1}
  return {questions,stats:{generated:questions.length,uniqueBeforeLimit:groups.reduce((n,g)=>n+g.length,0),matchCount,sourcesSuccessful:ok,sourcesFailed:failed,sourcesTotal:jobs.length,byCategory,byKind,at:new Date().toISOString(),errors}};
 }
-module.exports={LEAGUES,WORLD_YEARS,fromMatch,fromSeason,fromWorldCup,generateQuestions,combineAndCap,info};
+module.exports={SWISS_SEASONS,SWISS_CATEGORY,SWISS_EXTRA_FILES,SWISS_CHALLENGE_CATEGORY,SWISS_CUP_CATEGORY,LEAGUES,WORLD_YEARS,fromMatch,fromSeason,fromWorldCup,generateQuestions,combineAndCap,info};
