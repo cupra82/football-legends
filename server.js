@@ -4,6 +4,7 @@ const {generateQuestions}=require('./football-bank');
 const ranking=require('./leaderboard-store');
 const accounts=require('./accounts-store');
 const extras=require('./people-questions.json');
+const portugal=require('./portugal-questions.json');
 const FILTERED_KINDS=new Set(['Gol della squadra ospite','Gol della squadra di casa','Gol totali','Risultato esatto','Risultato all’intervallo','Esito della partita','Squadre a segno','Vittorie interne','Vittorie esterne','Vittorie stagionali','Pareggi stagionali','Reti stagionali','Statistiche club','Stadi dei Mondiali']);
 const qualityFilter=q=>!FILTERED_KINDS.has(q.kind);
 let biographies=[],peopleStats={};
@@ -12,7 +13,7 @@ const original=JSON.parse(fs.readFileSync(path.join(__dirname,'questions.json'),
 const snapshotPath=path.join(__dirname,'questions-generated.json');
 let generated=[];let snapshotStats={};
 try{const file=JSON.parse(fs.readFileSync(snapshotPath,'utf8'));if(Array.isArray(file.questions)){generated=file.questions;snapshotStats=file.stats||{}}}catch{}
-let questions=[...original,...generated.filter(qualityFilter),...extras,...biographies];let bankStatus={state:generated.length?'ready':'loading',count:questions.length,original:original.length,generated:generated.length,people:extras.length+biographies.length,biographies:biographies.length,hiddenMatchTrivia:generated.filter(q=>!qualityFilter(q)).length,goal:50000,peopleStats,stats:snapshotStats,updatedAt:snapshotStats.at||null};
+let questions=[...original,...generated.filter(qualityFilter),...extras,...portugal,...biographies];let bankStatus={state:generated.length?'ready':'loading',count:questions.length,original:original.length,generated:generated.length,people:extras.length+biographies.length,biographies:biographies.length,hiddenMatchTrivia:generated.filter(q=>!qualityFilter(q)).length,goal:50000,peopleStats,stats:snapshotStats,updatedAt:snapshotStats.at||null};
 let sampleSerial=0;
 function recalc(){const byCategory={},byKind={};for(const q of questions){byCategory[q.category]=(byCategory[q.category]||0)+1;byKind[q.kind||'Storico']=(byKind[q.kind||'Storico']||0)+1}bankStatus.count=questions.length;bankStatus.generated=generated.length;bankStatus.people=extras.length+biographies.length;bankStatus.biographies=biographies.length;bankStatus.hiddenMatchTrivia=generated.filter(q=>!qualityFilter(q)).length;bankStatus.peopleStats=peopleStats;bankStatus.byCategory=byCategory;bankStatus.byKind=byKind}
 recalc();
@@ -24,7 +25,7 @@ function samplePool(max=2500){if(questions.length<=max)return questions;const gr
  return shuffle(chosen)}
 let refreshing=false;
 async function refresh(){if(refreshing)return;refreshing=true;bankStatus.state=questions.length>1000?'ready':'loading';try{let result=await generateQuestions(()=>{});if(result.questions.length<1000)throw Error(`Solo ${result.questions.length} domande generate; archivio precedente conservato`);
- generated=result.questions;questions=[...original,...generated.filter(qualityFilter),...extras,...biographies];bankStatus={...bankStatus,state:'ready',stats:result.stats,updatedAt:new Date().toISOString(),error:null};recalc();console.log(`Football Legends: ${questions.length} domande, ${result.stats.sourcesSuccessful} fonti dati caricate`);
+ generated=result.questions;questions=[...original,...generated.filter(qualityFilter),...extras,...portugal,...biographies];bankStatus={...bankStatus,state:'ready',stats:result.stats,updatedAt:new Date().toISOString(),error:null};recalc();console.log(`Football Legends: ${questions.length} domande, ${result.stats.sourcesSuccessful} fonti dati caricate`);
  // Salvataggio locale opportunistico: su Render Free non è persistente ai redeploy.
  try{fs.writeFileSync(snapshotPath,JSON.stringify({stats:result.stats,questions:generated}))}catch{}
  }catch(e){bankStatus.state=questions.length>1000?'ready':'fallback';bankStatus.error=e.message;console.error('Database: '+e.message)}finally{refreshing=false}}
@@ -55,7 +56,7 @@ const httpServer=http.createServer((req,res)=>{
  }
  if(pathname==='/api/leaderboard/status'){res.writeHead(200,{'Content-Type':'application/json; charset=utf-8','Cache-Control':'no-store'});return res.end(JSON.stringify(ranking.status()))}
  if(pathname==='/api/leaderboard'){res.writeHead(200,{'Content-Type':'application/json; charset=utf-8','Cache-Control':'no-store'});return ranking.leaderboard(30).then(rows=>res.end(JSON.stringify({status:ranking.status(),players:rows}))).catch(e=>res.end(JSON.stringify({status:{...ranking.status(),ready:false},players:[]})))}
- if(pathname==='/api/version'){res.writeHead(200,{'Content-Type':'application/json; charset=utf-8','Cache-Control':'no-store'});return res.end(JSON.stringify({version:'1.3.2',game:'Football Legends',state:bankStatus.state,questions:bankStatus.count}))}
+ if(pathname==='/api/version'){res.writeHead(200,{'Content-Type':'application/json; charset=utf-8','Cache-Control':'no-store'});return res.end(JSON.stringify({version:'1.3.3',game:'Football Legends',state:bankStatus.state,questions:bankStatus.count}))}
  if(pathname==='/api/status'){res.writeHead(200,{'Content-Type':'application/json; charset=utf-8','Cache-Control':'no-store'});return res.end(JSON.stringify(bankStatus))}
  if(pathname!=='/'&&pathname!=='/index.html'){res.writeHead(404);return res.end('Not found')}
  const data=fs.readFileSync(path.join(__dirname,'index.html'));res.writeHead(200,{'Content-Type':'text/html; charset=utf-8','Cache-Control':'no-store'});res.end(data)

@@ -1,8 +1,8 @@
 {
   "name": "football-legends",
-  "version": "1.3.2",
+  "version": "1.3.3",
   "private": true,
-  "description": "Football Legends 1.3 — quiz su calciatori e allenatori con statistiche partite nascoste",
+  "description": "Football Legends 1.3.3 — Primeira Liga portoghese, leggende, multiplayer, classifiche persistenti",
   "scripts": {
     "start": "node server.js"
   },

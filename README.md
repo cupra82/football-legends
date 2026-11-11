@@ -1,16 +1,31 @@
-# Football Legends 1.3 — People First
+# Football Legends 1.3.3 — Primeira Liga portoghese
 
-**Cosa cambia:** le domande sui gol di singole partite, punteggi esatti, intervalli e statistiche numeriche di singole stagioni sono escluse dalle domande giocabili, anche se il file storico `questions-generated.json` resta disponibile nel repository. L'archivio di domande su persone viene scaricato e generato da GitHub Actions usando il dataset CC0 Reep/Wikidata.
+## Novità
+
+- Nuova categoria selezionabile **Primeira Liga portoghese**.
+- **99 domande curate**, sempre con **3 risposte**, su club, campioni, calciatori, allenatori e competizioni.
+- Non sono generate domande su gol in partite casuali o risultati all'intervallo.
+- Conservati server multiplayer, nickname, database PostgreSQL, classifiche e archivio delle domande.
+- La nuova categoria è selezionabile in Carriera solitaria e Arena online.
+- `/api/status` mostrerà la nuova voce `Primeira Liga portoghese` con 99 quesiti.
 
 ## Installazione
-1. In GitHub Desktop fai Fetch/Pull e copia **tutti** i file di questo pacchetto nel repository (sostituendo i vecchi; non cancellare `questions-generated.json`).
-2. Commit e Push origin. Render pubblicherà subito la nuova interfaccia e il filtro anti-domande-noiose.
-3. GitHub → Actions → Aggiorna archivio Football Legends → Run workflow. La generazione sulle persone prova a scaricare `data/people.csv` dal progetto `withqwerty/reep`.
-4. Controlla Actions: il passaggio “Genera domande su calciatori e allenatori” deve riuscire. Un errore non va ignorato. Se riesce, sarà aggiunto `people-generated.json` e GitHub farà un ulteriore commit; Render dovrà completare un nuovo deploy.
-5. Verifica `/api/status`: `biographies` indica quante nuove domande **reali** sono state caricate; `hiddenMatchTrivia` quante vecchie domande ripetitive vengono escluse. **Non aspettarti necessariamente 50.131 quesiti giocabili: è una scelta voluta.**
 
-**Attenzione**: non è possibile verificare il numero effettivo di biografie prima che Actions scarichi i dati. Il generatore è programmato per non pubblicare set inferiori a 2.000 quesiti. Le domande su ruoli e nazionalità sono basate sui campi del registro e possono essere aggiornate nel tempo; nominativi meno noti vengono filtrati chiedendo più identificativi incrociati. Il Pallone d’Oro conserva il set storico originale; non abbiamo inventato migliaia di vincitori o premi.
+1. Su GitHub Desktop esegui **Fetch origin** e **Pull origin** se disponibile.
+2. Estrai questo ZIP e copia tutto il suo contenuto nella cartella locale del repository, sostituendo i file esistenti senza cancellare i file non presenti nello ZIP.
+3. **Non cancellare** `questions-generated.json` e `people-generated.json`, perché questi due file vengono creati da GitHub Actions e possono non essere presenti nello ZIP.
+4. In GitHub Desktop: **Commit to main → Push origin**.
+5. Non serve eseguire **Run workflow**: le 99 domande portoghesi sono già incluse nel nuovo file `portugal-questions.json`.
+6. Verifica che Render sia Live e apri `/api/version` (atteso `1.3.3`) e `/api/status` (categoria `Primeira Liga portoghese`).
+7. Forza il refresh nel browser con Ctrl+Shift+R.
 
-**Fonte biografie:** https://github.com/withqwerty/reep — database CC0 derivato da Wikidata. **Fonte storico:** OpenFootball CC0. Conservare gli accrediti quando si redistribuisce il gioco.
+## Fonti principali
 
-**Test locali:** `node test-people-bank.js`; `node --check server.js`; `node --check scripts/build-people.js`.
+- RSSSF albo d'oro: https://rsssf.org/tablesp/portchamp.html
+- UEFA club portoghesi: https://pt.uefa.com/uefachampionsleague/news/023d-0e97b175ee2d-090504adece2-1000--palmares-na-uefa-clubes-com-mais-titulos/
+- UEFA Champions Porto 2004: https://www.uefa.com/uefachampionsleague/news/0250-0c50f100f076-ecb0d9d85bb1-1000--2003-04-porto-pull-off-biggest-surprise/
+- UEFA storia Porto: https://www.uefa.com/uefachampionsleague/news/025a-0eaae2d4aef0-8d3790dac4c0--raise-a-glass-to-porto/
+- UEFA calciatori portoghesi: https://www.uefa.com/news/0246-0e98e228fe16-d5ff2a10c737-1000--europe-s-top-portuguese-players/
+- Primeira Liga marcatori: https://futebol.pt/recordes/melhores-marcadores-liga/
+
+Le domande stagionali arrivano fino alla stagione 2025/26 conclusa. La stagione 2026/27 non è ancora conclusa.
