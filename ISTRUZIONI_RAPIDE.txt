@@ -1,0 +1,13 @@
+FOOTBALL LEGENDS v0.4 — 50.000 DOMANDE (OBIETTIVO GENERATORE)
+
+1. Estrai tutti i file dello ZIP.
+2. In GitHub apri cupra82/football-legends e carica tutti i file, incluse le cartelle scripts e .github (conservando i percorsi).
+3. Commit changes: Render ridistribuisce il server.
+4. Apri https://football-legends-okp1.onrender.com/api/status
+5. Verifica count, generated e state. Il numero è REALE, non stimato.
+6. Nel repository: Actions -> Aggiorna archivio Football Legends -> Run workflow.
+7. Dopo la generazione, l'azione salva questions-generated.json, così il server è subito pronto dopo un riavvio.
+
+Il generatore punta a fino a 50.000 domande aggiuntive, ma lo ZIP include solo le 131 domande storiche iniziali. Le altre vengono prodotte da fonti CC0 durante l'esecuzione con Internet.
+
+Nota: i nuovi quesiti coprono risultati, statistiche dei club, marcatori e stadi dei Mondiali; le biografie e i trasferimenti completi dal 1900 a oggi restano un ulteriore capitolo da sviluppare con fonti affidabili.

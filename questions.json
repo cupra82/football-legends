@@ -1077,5 +1077,629 @@
     ],
     "answer": 0,
     "explanation": "Paolo Rossi segnò tre reti nella vittoria 3-2 al Brasile."
+  },
+  {
+    "id": 84,
+    "category": "La Liga",
+    "difficulty": 1,
+    "question": "Chi ha vinto La Liga nella stagione 2025/26?",
+    "options": [
+      "Barcellona",
+      "Real Madrid",
+      "Atlético Madrid"
+    ],
+    "answer": 0,
+    "explanation": "Il Barcellona ha conquistato il titolo 2025/26 con 94 punti."
+  },
+  {
+    "id": 85,
+    "category": "La Liga",
+    "difficulty": 2,
+    "question": "Chi è stato premiato come miglior giocatore di La Liga 2025/26?",
+    "options": [
+      "Lamine Yamal",
+      "Kylian Mbappé",
+      "Jude Bellingham"
+    ],
+    "answer": 0,
+    "explanation": "Il premio ufficiale di miglior giocatore 2025/26 è stato assegnato a Lamine Yamal."
+  },
+  {
+    "id": 86,
+    "category": "La Liga",
+    "difficulty": 1,
+    "question": "Chi allenava il Barcellona campione di Spagna nel 2025/26?",
+    "options": [
+      "Hansi Flick",
+      "Xavi Hernández",
+      "Carlo Ancelotti"
+    ],
+    "answer": 0,
+    "explanation": "Hansi Flick ha guidato il Barcellona al titolo 2025/26."
+  },
+  {
+    "id": 87,
+    "category": "La Liga",
+    "difficulty": 3,
+    "question": "Quanti punti ha ottenuto il Barcellona campione 2025/26?",
+    "options": [
+      "94",
+      "88",
+      "91"
+    ],
+    "answer": 0,
+    "explanation": "La Liga ha comunicato 94 punti per il Barça 2025/26."
+  },
+  {
+    "id": 88,
+    "category": "La Liga",
+    "difficulty": 2,
+    "question": "Quale club vinse la prima edizione del campionato spagnolo nel 1928/29?",
+    "options": [
+      "Barcellona",
+      "Real Madrid",
+      "Athletic Club"
+    ],
+    "answer": 0,
+    "explanation": "La prima edizione 1928/29 fu vinta dal Barcellona."
+  },
+  {
+    "id": 89,
+    "category": "La Liga",
+    "difficulty": 3,
+    "question": "Quale club vinse La Liga nel 1934/35?",
+    "options": [
+      "Real Betis",
+      "Valencia",
+      "Siviglia"
+    ],
+    "answer": 0,
+    "explanation": "Il Real Betis vinse il titolo nel 1934/35."
+  },
+  {
+    "id": 90,
+    "category": "La Liga",
+    "difficulty": 3,
+    "question": "Quale club vinse La Liga nel 1929/30?",
+    "options": [
+      "Athletic Club",
+      "Barcellona",
+      "Real Madrid"
+    ],
+    "answer": 0,
+    "explanation": "La Liga 1929/30 fu conquistata dall’Athletic Club."
+  },
+  {
+    "id": 91,
+    "category": "La Liga",
+    "difficulty": 1,
+    "question": "In quale città gioca le partite casalinghe il Real Betis?",
+    "options": [
+      "Siviglia",
+      "Valencia",
+      "Vigo"
+    ],
+    "answer": 0,
+    "explanation": "Il Real Betis è uno dei club della città di Siviglia."
+  },
+  {
+    "id": 92,
+    "category": "La Liga",
+    "difficulty": 1,
+    "question": "Quale squadra conquistò il titolo spagnolo 2024/25?",
+    "options": [
+      "Barcellona",
+      "Atlético Madrid",
+      "Real Madrid"
+    ],
+    "answer": 0,
+    "explanation": "Il Barcellona conquistò La Liga 2024/25."
+  },
+  {
+    "id": 93,
+    "category": "La Liga",
+    "difficulty": 2,
+    "question": "Chi ricevette il premio di miglior allenatore di La Liga 2025/26?",
+    "options": [
+      "Hansi Flick",
+      "Diego Simeone",
+      "Manuel Pellegrini"
+    ],
+    "answer": 0,
+    "explanation": "La Liga ha nominato Hansi Flick miglior allenatore 2025/26."
+  },
+  {
+    "id": 94,
+    "category": "La Liga",
+    "difficulty": 2,
+    "question": "Quale club spagnolo è soprannominato Los Colchoneros?",
+    "options": [
+      "Atlético Madrid",
+      "Valencia",
+      "Villarreal"
+    ],
+    "answer": 0,
+    "explanation": "Los Colchoneros è un soprannome dell’Atlético Madrid."
+  },
+  {
+    "id": 95,
+    "category": "La Liga",
+    "difficulty": 1,
+    "question": "Dove si trova lo stadio San Mamés?",
+    "options": [
+      "Bilbao",
+      "Madrid",
+      "Siviglia"
+    ],
+    "answer": 0,
+    "explanation": "San Mamés è lo stadio dell’Athletic Club di Bilbao."
+  },
+  {
+    "id": 96,
+    "category": "Premier League",
+    "difficulty": 1,
+    "question": "Chi ha vinto la Premier League 2025/26?",
+    "options": [
+      "Arsenal",
+      "Liverpool",
+      "Manchester City"
+    ],
+    "answer": 0,
+    "explanation": "Il sito ufficiale della Premier League indica l’Arsenal campione nel 2025/26."
+  },
+  {
+    "id": 97,
+    "category": "Premier League",
+    "difficulty": 1,
+    "question": "Chi ha vinto la Premier League 2024/25?",
+    "options": [
+      "Liverpool",
+      "Arsenal",
+      "Chelsea"
+    ],
+    "answer": 0,
+    "explanation": "Il Liverpool ha conquistato il titolo 2024/25."
+  },
+  {
+    "id": 98,
+    "category": "Premier League",
+    "difficulty": 1,
+    "question": "Chi ha vinto la Premier League 2015/16?",
+    "options": [
+      "Leicester City",
+      "Tottenham",
+      "Manchester United"
+    ],
+    "answer": 0,
+    "explanation": "Il Leicester City completò una delle imprese più sorprendenti nel 2015/16."
+  },
+  {
+    "id": 99,
+    "category": "Premier League",
+    "difficulty": 2,
+    "question": "Quale club rimase imbattuto in Premier League nel 2003/04?",
+    "options": [
+      "Arsenal",
+      "Chelsea",
+      "Manchester City"
+    ],
+    "answer": 0,
+    "explanation": "L’Arsenal di Arsène Wenger concluse il campionato 2003/04 senza sconfitte."
+  },
+  {
+    "id": 100,
+    "category": "Premier League",
+    "difficulty": 2,
+    "question": "Chi vinse la prima Premier League nel 1992/93?",
+    "options": [
+      "Manchester United",
+      "Blackburn Rovers",
+      "Newcastle United"
+    ],
+    "answer": 0,
+    "explanation": "Il Manchester United vinse la stagione inaugurale 1992/93."
+  },
+  {
+    "id": 101,
+    "category": "Premier League",
+    "difficulty": 3,
+    "question": "Chi vinse la Premier League 1994/95?",
+    "options": [
+      "Blackburn Rovers",
+      "Arsenal",
+      "Chelsea"
+    ],
+    "answer": 0,
+    "explanation": "Il Blackburn Rovers vinse il campionato nel 1994/95."
+  },
+  {
+    "id": 102,
+    "category": "Premier League",
+    "difficulty": 1,
+    "question": "Quale club vinse la Premier League 2019/20?",
+    "options": [
+      "Liverpool",
+      "Manchester City",
+      "Leicester City"
+    ],
+    "answer": 0,
+    "explanation": "Il Liverpool conquistò il titolo nel 2019/20."
+  },
+  {
+    "id": 103,
+    "category": "Premier League",
+    "difficulty": 2,
+    "question": "Quale squadra vinse la Premier League 2011/12?",
+    "options": [
+      "Manchester City",
+      "Manchester United",
+      "Chelsea"
+    ],
+    "answer": 0,
+    "explanation": "Il Manchester City vinse il titolo 2011/12."
+  },
+  {
+    "id": 104,
+    "category": "Premier League",
+    "difficulty": 2,
+    "question": "Quale squadra vinse la Premier League 2016/17?",
+    "options": [
+      "Chelsea",
+      "Arsenal",
+      "Tottenham"
+    ],
+    "answer": 0,
+    "explanation": "Il Chelsea vinse la Premier League 2016/17."
+  },
+  {
+    "id": 105,
+    "category": "Premier League",
+    "difficulty": 1,
+    "question": "In quale città gioca le partite casalinghe il Newcastle United?",
+    "options": [
+      "Newcastle upon Tyne",
+      "Leeds",
+      "Birmingham"
+    ],
+    "answer": 0,
+    "explanation": "Il Newcastle United gioca a St James’ Park, a Newcastle upon Tyne."
+  },
+  {
+    "id": 106,
+    "category": "Premier League",
+    "difficulty": 1,
+    "question": "Quale squadra vinse la Premier League 2023/24?",
+    "options": [
+      "Manchester City",
+      "Arsenal",
+      "Liverpool"
+    ],
+    "answer": 0,
+    "explanation": "Il Manchester City vinse il titolo 2023/24."
+  },
+  {
+    "id": 107,
+    "category": "Premier League",
+    "difficulty": 1,
+    "question": "Quale club è noto come The Gunners?",
+    "options": [
+      "Arsenal",
+      "Everton",
+      "West Ham"
+    ],
+    "answer": 0,
+    "explanation": "The Gunners è il soprannome dell’Arsenal."
+  },
+  {
+    "id": 108,
+    "category": "Campionato svizzero",
+    "difficulty": 1,
+    "question": "Chi ha vinto la Super League svizzera 2025/26?",
+    "options": [
+      "FC Thun",
+      "FC Basilea",
+      "Young Boys"
+    ],
+    "answer": 0,
+    "explanation": "Il Thun ha vinto il suo primo titolo svizzero nella stagione 2025/26."
+  },
+  {
+    "id": 109,
+    "category": "Campionato svizzero",
+    "difficulty": 2,
+    "question": "Quale neopromossa vinse il titolo svizzero 2025/26?",
+    "options": [
+      "FC Thun",
+      "FC Aarau",
+      "FC Sion"
+    ],
+    "answer": 0,
+    "explanation": "Il Thun vinse da neopromossa nel 2025/26."
+  },
+  {
+    "id": 110,
+    "category": "Campionato svizzero",
+    "difficulty": 2,
+    "question": "Chi allenava il Thun campione svizzero 2025/26?",
+    "options": [
+      "Mauro Lustrinelli",
+      "Gerardo Seoane",
+      "Raphaël Wicky"
+    ],
+    "answer": 0,
+    "explanation": "Mauro Lustrinelli guidò il Thun al titolo 2025/26."
+  },
+  {
+    "id": 111,
+    "category": "Campionato svizzero",
+    "difficulty": 3,
+    "question": "Chi fu il capocannoniere della Super League svizzera 2025/26?",
+    "options": [
+      "Christian Fassnacht",
+      "Alessandro Vogt",
+      "Xherdan Shaqiri"
+    ],
+    "answer": 0,
+    "explanation": "Christian Fassnacht concluse come miglior marcatore con 18 reti."
+  },
+  {
+    "id": 112,
+    "category": "Campionato svizzero",
+    "difficulty": 3,
+    "question": "Quanti punti raccolse il Thun nella Super League 2025/26?",
+    "options": [
+      "75",
+      "70",
+      "67"
+    ],
+    "answer": 0,
+    "explanation": "Il Thun terminò la stagione 2025/26 con 75 punti."
+  },
+  {
+    "id": 113,
+    "category": "Campionato svizzero",
+    "difficulty": 2,
+    "question": "Quale squadra arrivò seconda nella Super League 2025/26?",
+    "options": [
+      "San Gallo",
+      "Lugano",
+      "Sion"
+    ],
+    "answer": 0,
+    "explanation": "Il San Gallo finì secondo, davanti al Lugano."
+  },
+  {
+    "id": 114,
+    "category": "Campionato svizzero",
+    "difficulty": 2,
+    "question": "Quale squadra arrivò terza nella Super League 2025/26?",
+    "options": [
+      "Lugano",
+      "Basilea",
+      "Young Boys"
+    ],
+    "answer": 0,
+    "explanation": "Il Lugano chiuse al terzo posto con 67 punti."
+  },
+  {
+    "id": 115,
+    "category": "Campionato svizzero",
+    "difficulty": 2,
+    "question": "Quale club svizzero ha il maggior numero di titoli nazionali nel palmarès storico SFL aggiornato al 2026?",
+    "options": [
+      "Grasshopper Club Zurigo",
+      "FC Basilea",
+      "Servette"
+    ],
+    "answer": 0,
+    "explanation": "Nel palmarès SFL 2026 il Grasshopper è in testa con 27 titoli."
+  },
+  {
+    "id": 116,
+    "category": "Campionato svizzero",
+    "difficulty": 3,
+    "question": "Da quale stagione si chiama Super League la massima serie svizzera?",
+    "options": [
+      "2003/04",
+      "1999/00",
+      "2010/11"
+    ],
+    "answer": 0,
+    "explanation": "La Super League svizzera nasce con la stagione 2003/04."
+  },
+  {
+    "id": 117,
+    "category": "Campionato svizzero",
+    "difficulty": 3,
+    "question": "Quale squadra fu l’altra neopromossa campione svizzera nel 1951/52?",
+    "options": [
+      "Grasshopper Club Zurigo",
+      "FC Lugano",
+      "FC Zurigo"
+    ],
+    "answer": 0,
+    "explanation": "Prima del Thun nel 2025/26, il GC vinse il titolo da neopromossa nel 1951/52."
+  },
+  {
+    "id": 118,
+    "category": "Campionato svizzero",
+    "difficulty": 1,
+    "question": "Quale club svizzero gioca allo stadio di Cornaredo?",
+    "options": [
+      "FC Lugano",
+      "FC Sion",
+      "FC Losanna"
+    ],
+    "answer": 0,
+    "explanation": "Cornaredo è lo stadio di casa del FC Lugano."
+  },
+  {
+    "id": 119,
+    "category": "Campionato svizzero",
+    "difficulty": 3,
+    "question": "Quale squadra vinse la seconda edizione storica della Super League nel 2004/05?",
+    "options": [
+      "FC Basilea",
+      "FC Zurigo",
+      "Young Boys"
+    ],
+    "answer": 0,
+    "explanation": "Il Basilea vinse il titolo nel 2004/05."
+  },
+  {
+    "id": 120,
+    "category": "Süper Lig turca",
+    "difficulty": 1,
+    "question": "Chi ha vinto la Süper Lig turca 2025/26?",
+    "options": [
+      "Galatasaray",
+      "Fenerbahçe",
+      "Beşiktaş"
+    ],
+    "answer": 0,
+    "explanation": "La federazione turca TFF indica il Galatasaray campione 2025/26."
+  },
+  {
+    "id": 121,
+    "category": "Süper Lig turca",
+    "difficulty": 2,
+    "question": "Chi vinse il primo titolo della prima lega nazionale turca nel 1959?",
+    "options": [
+      "Fenerbahçe",
+      "Galatasaray",
+      "Beşiktaş"
+    ],
+    "answer": 0,
+    "explanation": "Nel 1959 il Fenerbahçe sconfisse il Galatasaray nella finale su due partite."
+  },
+  {
+    "id": 122,
+    "category": "Süper Lig turca",
+    "difficulty": 2,
+    "question": "Quale squadra vinse la Süper Lig 2021/22?",
+    "options": [
+      "Trabzonspor",
+      "Galatasaray",
+      "Başakşehir"
+    ],
+    "answer": 0,
+    "explanation": "Il Trabzonspor ha conquistato il titolo 2021/22."
+  },
+  {
+    "id": 123,
+    "category": "Süper Lig turca",
+    "difficulty": 1,
+    "question": "Chi ha vinto la Süper Lig turca 2024/25?",
+    "options": [
+      "Galatasaray",
+      "Beşiktaş",
+      "Fenerbahçe"
+    ],
+    "answer": 0,
+    "explanation": "La TFF accredita al Galatasaray il titolo 2024/25."
+  },
+  {
+    "id": 124,
+    "category": "Süper Lig turca",
+    "difficulty": 3,
+    "question": "Quale squadra vinse la Süper Lig 2009/10?",
+    "options": [
+      "Bursaspor",
+      "Galatasaray",
+      "Trabzonspor"
+    ],
+    "answer": 0,
+    "explanation": "Il Bursaspor vinse il titolo 2009/10."
+  },
+  {
+    "id": 125,
+    "category": "Süper Lig turca",
+    "difficulty": 2,
+    "question": "Quale squadra vinse la Süper Lig 2019/20?",
+    "options": [
+      "İstanbul Başakşehir",
+      "Fenerbahçe",
+      "Beşiktaş"
+    ],
+    "answer": 0,
+    "explanation": "Il Başakşehir conquistò il campionato 2019/20."
+  },
+  {
+    "id": 126,
+    "category": "Süper Lig turca",
+    "difficulty": 2,
+    "question": "Chi vinse il titolo turco 2020/21?",
+    "options": [
+      "Beşiktaş",
+      "Galatasaray",
+      "Trabzonspor"
+    ],
+    "answer": 0,
+    "explanation": "Il Beşiktaş vinse il campionato 2020/21."
+  },
+  {
+    "id": 127,
+    "category": "Süper Lig turca",
+    "difficulty": 3,
+    "question": "Quale club vinse il campionato turco 1975/76?",
+    "options": [
+      "Trabzonspor",
+      "Fenerbahçe",
+      "Galatasaray"
+    ],
+    "answer": 0,
+    "explanation": "Il Trabzonspor conquistò il titolo 1975/76."
+  },
+  {
+    "id": 128,
+    "category": "Süper Lig turca",
+    "difficulty": 2,
+    "question": "Quale squadra vinse la Süper Lig 2013/14?",
+    "options": [
+      "Fenerbahçe",
+      "Galatasaray",
+      "Beşiktaş"
+    ],
+    "answer": 0,
+    "explanation": "Il Fenerbahçe conquistò il titolo 2013/14."
+  },
+  {
+    "id": 129,
+    "category": "Süper Lig turca",
+    "difficulty": 2,
+    "question": "Quale squadra vinse il campionato turco 2002/03?",
+    "options": [
+      "Beşiktaş",
+      "Fenerbahçe",
+      "Galatasaray"
+    ],
+    "answer": 0,
+    "explanation": "Il Beşiktaş vinse nel 2002/03."
+  },
+  {
+    "id": 130,
+    "category": "Süper Lig turca",
+    "difficulty": 1,
+    "question": "Quale club turco è soprannominato Sarı-Kırmızılılar, cioè giallorossi?",
+    "options": [
+      "Galatasaray",
+      "Beşiktaş",
+      "Trabzonspor"
+    ],
+    "answer": 0,
+    "explanation": "Il Galatasaray è conosciuto per i colori giallo e rosso."
+  },
+  {
+    "id": 131,
+    "category": "Süper Lig turca",
+    "difficulty": 3,
+    "question": "Da quale anno parte la cronologia della massima lega nazionale turca riconosciuta dalla TFF?",
+    "options": [
+      "1959",
+      "1968",
+      "1981"
+    ],
+    "answer": 0,
+    "explanation": "La TFF considera il 1959 la stagione d’inizio del campionato nazionale."
   }
 ]
