@@ -1,26 +1,16 @@
-# FOOTBALL LEGENDS v0.8 — PACCHETTO COMPLETO
+# Football Legends 1.3 — People First
 
-Questo pacchetto contiene **il progetto completo** per il server Render e per GitHub, NON il file delle 50.000 domande generate. Il file `questions-generated.json` che GitHub Actions ha già creato rimane nel repository quando si copiano i file sopra quelli esistenti. **Non cancellarlo**.
+**Cosa cambia:** le domande sui gol di singole partite, punteggi esatti, intervalli e statistiche numeriche di singole stagioni sono escluse dalle domande giocabili, anche se il file storico `questions-generated.json` resta disponibile nel repository. L'archivio di domande su persone viene scaricato e generato da GitHub Actions usando il dataset CC0 Reep/Wikidata.
 
-## Cosa include
-- Carriera solitaria e duello: 10, 15, 20, 30 domande.
-- Arena online: selezione 10, 15, 20, 30 domande **prima di creare la stanza**, modificabile dall'host anche nella lobby.
-- Server WebSocket con tempo e opzioni controllati sul server, fino a 8 giocatori.
-- Generatore 50.000 domande con riserva per Super League svizzera, Challenge League e Coppa Svizzera dove disponibili.
-- `scripts/build-bank.js` e `.github/workflows/update-questions.yml` per aggiornare `questions-generated.json`.
+## Installazione
+1. In GitHub Desktop fai Fetch/Pull e copia **tutti** i file di questo pacchetto nel repository (sostituendo i vecchi; non cancellare `questions-generated.json`).
+2. Commit e Push origin. Render pubblicherà subito la nuova interfaccia e il filtro anti-domande-noiose.
+3. GitHub → Actions → Aggiorna archivio Football Legends → Run workflow. La generazione sulle persone prova a scaricare `data/people.csv` dal progetto `withqwerty/reep`.
+4. Controlla Actions: il passaggio “Genera domande su calciatori e allenatori” deve riuscire. Un errore non va ignorato. Se riesce, sarà aggiunto `people-generated.json` e GitHub farà un ulteriore commit; Render dovrà completare un nuovo deploy.
+5. Verifica `/api/status`: `biographies` indica quante nuove domande **reali** sono state caricate; `hiddenMatchTrivia` quante vecchie domande ripetitive vengono escluse. **Non aspettarti necessariamente 50.131 quesiti giocabili: è una scelta voluta.**
 
-## Installazione su GitHub Desktop
-1. In GitHub Desktop: **Fetch origin**, poi **Pull origin** se disponibile. NON forzare se compaiono conflitti.
-2. Repository > Show in Explorer. Aprire questa cartella, copiare **tutti i file e le sottocartelle contenuti in questo pacchetto** nella cartella del repository. **Non eliminare i file già presenti**.
-3. GitHub Desktop: Commit to main > Push origin. Se segnala modifiche remote, Fetch > Pull > Push e risolvi eventuali conflitti.
-4. GitHub Actions > Aggiorna archivio Football Legends > Run workflow, branch main.
-5. Verificare che il log mostri fonti svizzere: in `/api/status`, nel campo `stats.byCategory`, cercare `Campionato svizzero`, `Challenge League svizzera`, `Coppa Svizzera`.
-6. Render deve completare il deploy `Live`; aprire il sito con Ctrl+F5 per aggiornare la cache.
+**Attenzione**: non è possibile verificare il numero effettivo di biografie prima che Actions scarichi i dati. Il generatore è programmato per non pubblicare set inferiori a 2.000 quesiti. Le domande su ruoli e nazionalità sono basate sui campi del registro e possono essere aggiornate nel tempo; nominativi meno noti vengono filtrati chiedendo più identificativi incrociati. Il Pallone d’Oro conserva il set storico originale; non abbiamo inventato migliaia di vincitori o premi.
 
-## Verifica in Arena
-Nel sito aprire Arena online: il campo `Numero di domande Arena online` deve essere visibile subito. Scegliere 30, creare stanza, entrare da un secondo dispositivo e avviare. In alto la partita deve mostrare `DOMANDA 1 / 30`.
+**Fonte biografie:** https://github.com/withqwerty/reep — database CC0 derivato da Wikidata. **Fonte storico:** OpenFootball CC0. Conservare gli accrediti quando si redistribuisce il gioco.
 
-## Chiarimenti sui numeri
-Il totale 50.131 è corretto per la banca generata 50.000 + 131 originali. Le domande svizzere **sostituiscono** altre domande nella quota delle 50.000: il totale può rimanere 50.131 anche quando quelle svizzere sono state aggiunte. Bisogna guardare `stats.byCategory`, non solo `count`. **Non è garantito** che siano esattamente 5.000 svizzere: dipende dalle fonti disponibili.
-
-Fonti: OpenFootball (CC0), https://openfootball.github.io/europe/ e https://github.com/openfootball/football.json
+**Test locali:** `node test-people-bank.js`; `node --check server.js`; `node --check scripts/build-people.js`.

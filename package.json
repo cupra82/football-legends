@@ -1,1 +1,16 @@
-{"name":"football-legends","version":"0.1.0","private":true,"description":"Football Legends multiplayer trivia game","scripts":{"start":"node server.js"},"dependencies":{"ws":"^8.18.0"},"engines":{"node":">=18"}}
+{
+  "name": "football-legends",
+  "version": "1.3.0",
+  "private": true,
+  "description": "Football Legends 1.3 — quiz su calciatori e allenatori con statistiche partite nascoste",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "ws": "^8.18.0",
+    "pg": "^8.13.1"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

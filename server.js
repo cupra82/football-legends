@@ -1,13 +1,20 @@
 'use strict';
 const http=require('http'),WebSocket=require('ws'),fs=require('fs'),path=require('path'),crypto=require('crypto');
 const {generateQuestions}=require('./football-bank');
+const ranking=require('./leaderboard-store');
+const accounts=require('./accounts-store');
+const extras=require('./people-questions.json');
+const FILTERED_KINDS=new Set(['Gol della squadra ospite','Gol della squadra di casa','Gol totali','Risultato esatto','Risultato all’intervallo','Esito della partita','Squadre a segno','Vittorie interne','Vittorie esterne','Vittorie stagionali','Pareggi stagionali','Reti stagionali','Statistiche club','Stadi dei Mondiali']);
+const qualityFilter=q=>!FILTERED_KINDS.has(q.kind);
+let biographies=[],peopleStats={};
+try{const file=JSON.parse(fs.readFileSync(path.join(__dirname,'people-generated.json'),'utf8'));if(Array.isArray(file.questions)){biographies=file.questions;peopleStats=file.stats||{}}}catch{}
 const original=JSON.parse(fs.readFileSync(path.join(__dirname,'questions.json'),'utf8'));
 const snapshotPath=path.join(__dirname,'questions-generated.json');
 let generated=[];let snapshotStats={};
 try{const file=JSON.parse(fs.readFileSync(snapshotPath,'utf8'));if(Array.isArray(file.questions)){generated=file.questions;snapshotStats=file.stats||{}}}catch{}
-let questions=[...original,...generated];let bankStatus={state:generated.length?'ready':'loading',count:questions.length,original:original.length,generated:generated.length,goal:50000,stats:snapshotStats,updatedAt:snapshotStats.at||null};
+let questions=[...original,...generated.filter(qualityFilter),...extras,...biographies];let bankStatus={state:generated.length?'ready':'loading',count:questions.length,original:original.length,generated:generated.length,people:extras.length+biographies.length,biographies:biographies.length,hiddenMatchTrivia:generated.filter(q=>!qualityFilter(q)).length,goal:50000,peopleStats,stats:snapshotStats,updatedAt:snapshotStats.at||null};
 let sampleSerial=0;
-function recalc(){const byCategory={},byKind={};for(const q of questions){byCategory[q.category]=(byCategory[q.category]||0)+1;byKind[q.kind||'Storico']=(byKind[q.kind||'Storico']||0)+1}bankStatus.count=questions.length;bankStatus.generated=questions.length-original.length;bankStatus.byCategory=byCategory;bankStatus.byKind=byKind}
+function recalc(){const byCategory={},byKind={};for(const q of questions){byCategory[q.category]=(byCategory[q.category]||0)+1;byKind[q.kind||'Storico']=(byKind[q.kind||'Storico']||0)+1}bankStatus.count=questions.length;bankStatus.generated=generated.length;bankStatus.people=extras.length+biographies.length;bankStatus.biographies=biographies.length;bankStatus.hiddenMatchTrivia=generated.filter(q=>!qualityFilter(q)).length;bankStatus.peopleStats=peopleStats;bankStatus.byCategory=byCategory;bankStatus.byKind=byKind}
 recalc();
 function shuffle(a){a=[...a];for(let i=a.length-1;i>0;i--){const j=crypto.randomInt(i+1);[a[i],a[j]]=[a[j],a[i]]}return a}
 function samplePool(max=2500){if(questions.length<=max)return questions;const groups=new Map();for(const q of questions){if(!groups.has(q.category))groups.set(q.category,[]);groups.get(q.category).push(q)}
@@ -17,18 +24,37 @@ function samplePool(max=2500){if(questions.length<=max)return questions;const gr
  return shuffle(chosen)}
 let refreshing=false;
 async function refresh(){if(refreshing)return;refreshing=true;bankStatus.state=questions.length>1000?'ready':'loading';try{let result=await generateQuestions(()=>{});if(result.questions.length<1000)throw Error(`Solo ${result.questions.length} domande generate; archivio precedente conservato`);
- generated=result.questions;questions=[...original,...generated];bankStatus={...bankStatus,state:'ready',stats:result.stats,updatedAt:new Date().toISOString(),error:null};recalc();console.log(`Football Legends: ${questions.length} domande, ${result.stats.sourcesSuccessful} fonti dati caricate`);
+ generated=result.questions;questions=[...original,...generated.filter(qualityFilter),...extras,...biographies];bankStatus={...bankStatus,state:'ready',stats:result.stats,updatedAt:new Date().toISOString(),error:null};recalc();console.log(`Football Legends: ${questions.length} domande, ${result.stats.sourcesSuccessful} fonti dati caricate`);
  // Salvataggio locale opportunistico: su Render Free non è persistente ai redeploy.
  try{fs.writeFileSync(snapshotPath,JSON.stringify({stats:result.stats,questions:generated}))}catch{}
  }catch(e){bankStatus.state=questions.length>1000?'ready':'fallback';bankStatus.error=e.message;console.error('Database: '+e.message)}finally{refreshing=false}}
 const PORT=process.env.PORT||3000,rooms=new Map(),clients=new Map();
+const registerIp=new Map();
+function limited(ip){const now=Date.now(),entry=registerIp.get(ip)||{start:now,count:0};if(now-entry.start>3600000){entry.start=now;entry.count=0}entry.count++;registerIp.set(ip,entry);return entry.count>50}
+async function accountRequest(req,res,pathname){
+ const origin=req.headers.origin;
+ if(origin){try{if(new URL(origin).host!==req.headers.host)throw Error('Origine non consentita')}catch{return jsonReply(res,403,{error:'Origine non consentita'})}}
+ const ip=req.socket.remoteAddress||'unknown';if(limited(ip))return jsonReply(res,429,{error:'Troppe richieste, riprova più tardi.'});
+ let raw='';try{for await(const chunk of req){raw+=chunk;if(raw.length>4096)throw Error('Richiesta troppo grande')}const x=JSON.parse(raw||'{}');
+  if(pathname==='/api/account/register')return jsonReply(res,200,await accounts.register(x.nickname));
+  if(pathname==='/api/account/recover')return jsonReply(res,200,await accounts.recover(x.nickname,x.code));
+  if(pathname==='/api/account/me'){const acc=await accounts.authenticate(x.token);return acc?jsonReply(res,200,acc):jsonReply(res,401,{error:'Sessione non valida. Recupera il profilo.'})}
+ }catch(e){return jsonReply(res,400,{error:e.message})}
+}
+function jsonReply(res,status,body){res.writeHead(status,{'Content-Type':'application/json; charset=utf-8','Cache-Control':'no-store','X-Content-Type-Options':'nosniff'});res.end(JSON.stringify(body))}
 const httpServer=http.createServer((req,res)=>{
  const pathname=(req.url||'/').split('?')[0];
+ if(pathname==='/api/account/status')return jsonReply(res,200,accounts.status());
+ if(pathname.startsWith('/api/account/')){if(req.method!=='POST')return jsonReply(res,405,{error:'Metodo non consentito'});return accountRequest(req,res,pathname)}
+
  if(pathname==='/api/questions'){
   const u=new URL(req.url,'http://localhost');let limit=Math.min(3500,Math.max(100,Number(u.searchParams.get('limit'))||2500));
   const selected=samplePool(limit);res.writeHead(200,{'Content-Type':'application/json; charset=utf-8','Cache-Control':'no-store'});
   return res.end(JSON.stringify({questions:selected,status:bankStatus,served: selected.length}));
  }
+ if(pathname==='/api/leaderboard/status'){res.writeHead(200,{'Content-Type':'application/json; charset=utf-8','Cache-Control':'no-store'});return res.end(JSON.stringify(ranking.status()))}
+ if(pathname==='/api/leaderboard'){res.writeHead(200,{'Content-Type':'application/json; charset=utf-8','Cache-Control':'no-store'});return ranking.leaderboard(30).then(rows=>res.end(JSON.stringify({status:ranking.status(),players:rows}))).catch(e=>res.end(JSON.stringify({status:{...ranking.status(),ready:false},players:[]})))}
+ if(pathname==='/api/version'){res.writeHead(200,{'Content-Type':'application/json; charset=utf-8','Cache-Control':'no-store'});return res.end(JSON.stringify({version:'1.3.0',game:'Football Legends',state:bankStatus.state,questions:bankStatus.count}))}
  if(pathname==='/api/status'){res.writeHead(200,{'Content-Type':'application/json; charset=utf-8','Cache-Control':'no-store'});return res.end(JSON.stringify(bankStatus))}
  if(pathname!=='/'&&pathname!=='/index.html'){res.writeHead(404);return res.end('Not found')}
  const data=fs.readFileSync(path.join(__dirname,'index.html'));res.writeHead(200,{'Content-Type':'text/html; charset=utf-8','Cache-Control':'no-store'});res.end(data)
@@ -38,20 +64,35 @@ const send=(ws,data)=>{if(ws&&ws.readyState===WebSocket.OPEN)ws.send(JSON.string
 function code(){let c;do{c=crypto.randomBytes(4).toString('hex').slice(0,6).toUpperCase()}while(rooms.has(c));return c}
 function clean(n){return String(n||'Campione').replace(/[<>\x00-\x1f]/g,'').trim().slice(0,20)||'Campione'}
 function summary(r){return [...r.players].sort((a,b)=>b.score-a.score).map(p=>({name:p.name,score:p.score}))}
-function lobby(r){r.players.forEach(p=>send(p.ws,{type:'lobby',code:r.code,hostForYou:r.host===p,players:r.players.map(q=>({name:q.name,host:q===r.host})),category:r.category,total:r.total,phase:r.state}))}
+function seriesBoard(r){return [...r.players].map(p=>({name:p.name,wins:p.wins||0,points:p.seriesPoints||0})).sort((a,b)=>b.wins-a.wins||b.points-a.points)}
+function lobby(r){r.players.forEach(p=>send(p.ws,{type:'lobby',code:r.code,hostForYou:r.host===p,players:r.players.map(q=>({name:q.name,host:q===r.host})),category:r.category,total:r.total,phase:r.state,rounds:r.rounds||0,series:seriesBoard(r)}))}
 function clearRoom(r){clearTimeout(r.timer);rooms.delete(r.code);r.players.forEach(p=>clients.delete(p.ws))}
-function finish(r){if(!rooms.has(r.code))return;clearTimeout(r.timer);r.timer=null;r.state='results';r.players.forEach(p=>send(p.ws,{type:'end',scores:summary(r),category:r.category,total:r.total,code:r.code,hostForYou:r.host===p}))}
+async function finish(r){
+ if(!rooms.has(r.code)||r.state==='results'||r.state==='saving')return;
+ clearTimeout(r.timer);r.timer=null;r.state='saving';
+ r.rounds=(r.rounds||0)+1;
+ const best=Math.max(...r.players.map(p=>p.score));const winners=r.players.filter(p=>p.score===best);
+ for(const p of r.players){p.seriesPoints=(p.seriesPoints||0)+p.score;if(winners.includes(p))p.wins=(p.wins||0)+1}
+ let saved=false,saveError='';
+ try{saved=await ranking.record(r.roundId||crypto.randomUUID(),r.players.map(p=>({id:p.id,name:p.name,score:p.score,correct:p.correct,answered:p.answers})))}
+ catch(e){saveError='Le statistiche globali non sono state salvate: '+e.message;console.error(saveError)}
+ r.state='results';
+ r.players.forEach(p=>send(p.ws,{type:'end',scores:summary(r),category:r.category,total:r.total,code:r.code,hostForYou:r.host===p,rounds:r.rounds,series:seriesBoard(r),persistent:{...ranking.status(),saved,notice:saveError||(!ranking.status().ready?'Collega DATABASE_URL a Render per salvare vittorie e sconfitte dopo i riavvii.':'')}}))
+}
 function reveal(r){if(!rooms.has(r.code)||r.state!=='question')return;r.state='reveal';clearTimeout(r.timer);const q=r.current;broadcast(r,{type:'reveal',correct:r.order.indexOf(q.answer),answerText:q.options[q.answer],explanation:q.explanation,scores:summary(r)});r.timer=setTimeout(()=>next(r),3400)}
 function next(r){if(!rooms.has(r.code))return;if(r.index>=r.deck.length){finish(r);return}r.state='question';r.current=r.deck[r.index++];r.order=shuffle([0,1,2]);r.started=Date.now();r.answered=new Set();broadcast(r,{type:'question',number:r.index,total:r.deck.length,category:r.current.category,difficulty:r.current.difficulty,question:r.current.question,options:r.order.map(i=>r.current.options[i]),scores:summary(r),seconds:15});r.timer=setTimeout(()=>reveal(r),15500)}
-function detach(ws){let p=clients.get(ws);if(!p)return;let r=rooms.get(p.room);clients.delete(ws);if(!r)return;r.players=r.players.filter(q=>q!==p);if(!r.players.length){clearRoom(r);return}if(r.host===p)r.host=r.players[0];if(r.state==='lobby')lobby(r);else if(r.state==='results')r.players.forEach(u=>send(u.ws,{type:'end',scores:summary(r),category:r.category,total:r.total,code:r.code,hostForYou:r.host===u}));else if(r.state==='question'&&r.answered.size>=r.players.length)reveal(r)}
-wss.on('connection',ws=>{ws.isAlive=true;ws.on('pong',()=>ws.isAlive=true);ws.on('message',raw=>{let x;try{x=JSON.parse(raw)}catch{return}if(!x||typeof x.type!=='string')return;let p=clients.get(ws);
- if(x.type==='create'){if(p)return;const candidate=String(x.category||'Tutte');const validCats=new Set(questions.map(q=>q.category));const chosenCategory=candidate==='Tutte'||validCats.has(candidate)?candidate:'Tutte';const chosenTotal=[10,15,20,30].includes(Number(x.total))?Number(x.total):10;let r={code:code(),players:[],state:'lobby',host:null,timer:null,category:chosenCategory,total:chosenTotal};p={ws,room:r.code,name:clean(x.name),score:0};r.host=p;r.players.push(p);rooms.set(r.code,r);clients.set(ws,p);lobby(r);return}
- if(x.type==='join'){if(p)return;let r=rooms.get(String(x.code||'').toUpperCase());if(!r||r.state!=='lobby')return send(ws,{type:'error',message:'Stanza inesistente o partita già iniziata.'});if(r.players.length>=8)return send(ws,{type:'error',message:'Stanza piena (8 giocatori).'});p={ws,room:r.code,name:clean(x.name),score:0};r.players.push(p);clients.set(ws,p);lobby(r);return}
+function detach(ws){let p=clients.get(ws);if(!p)return;let r=rooms.get(p.room);clients.delete(ws);if(!r)return;r.players=r.players.filter(q=>q!==p);if(!r.players.length){clearRoom(r);return}if(r.host===p)r.host=r.players[0];if(r.state==='lobby')lobby(r);else if(r.state==='results')r.players.forEach(u=>send(u.ws,{type:'end',scores:summary(r),category:r.category,total:r.total,code:r.code,hostForYou:r.host===u,rounds:r.rounds||0,series:seriesBoard(r)}));else if(r.state==='question'&&r.answered.size>=r.players.length)reveal(r)}
+wss.on('connection',ws=>{ws.isAlive=true;ws.on('pong',()=>ws.isAlive=true);ws.on('message',async raw=>{let x;try{x=JSON.parse(raw)}catch{return}if(!x||typeof x.type!=='string')return;let p=clients.get(ws);
+ if(x.type==='create'){if(p)return;let acc;try{acc=await accounts.authenticate(x.token)}catch(e){return send(ws,{type:'error',message:'Verifica profilo non disponibile.'})}if(!acc)return send(ws,{type:'error',message:'Devi registrare o recuperare il tuo nickname prima di giocare.'});const candidate=String(x.category||'Tutte');const validCats=new Set(questions.map(q=>q.category));const chosenCategory=candidate==='Tutte'||validCats.has(candidate)?candidate:'Tutte';const chosenTotal=[10,15,20,30].includes(Number(x.total))?Number(x.total):10;let r={code:code(),players:[],state:'lobby',host:null,timer:null,category:chosenCategory,total:chosenTotal,rounds:0};p={ws,room:r.code,id:acc.id,name:acc.nickname,score:0,wins:0,seriesPoints:0,correct:0,answers:0};r.host=p;r.players.push(p);rooms.set(r.code,r);clients.set(ws,p);lobby(r);return}
+ if(x.type==='join'){if(p)return;let acc;try{acc=await accounts.authenticate(x.token)}catch(e){return send(ws,{type:'error',message:'Verifica profilo non disponibile.'})}if(!acc)return send(ws,{type:'error',message:'Devi registrare o recuperare il tuo nickname prima di giocare.'});let r=rooms.get(String(x.code||'').toUpperCase());if(!r||r.state!=='lobby')return send(ws,{type:'error',message:'Stanza inesistente o partita già iniziata.'});if(r.players.length>=8)return send(ws,{type:'error',message:'Stanza piena (8 giocatori).'});p={ws,room:r.code,id:acc.id,name:acc.nickname,score:0,wins:0,seriesPoints:0,correct:0,answers:0};if(r.players.some(u=>u.id===p.id))return send(ws,{type:'error',message:'Questo profilo è già nella stanza.'});r.players.push(p);clients.set(ws,p);lobby(r);return}
  if(!p)return;let r=rooms.get(p.room);if(!r)return;
- if(x.type==='rematch'){if(r.host!==p||r.state!=='results')return send(ws,{type:'error',message:'Solo l’organizzatore può preparare una rivincita.'});r.state='lobby';r.deck=[];r.index=0;r.players.forEach(u=>u.score=0);lobby(r);return}
+ if(x.type==='profile'){ranking.profile(p.id).then(profile=>send(ws,{type:'profile',profile,status:ranking.status()})).catch(()=>send(ws,{type:'profile',profile:null,status:ranking.status()}));return}
+ if(x.type==='rematch'){if(r.host!==p||r.state!=='results')return send(ws,{type:'error',message:'Solo l’organizzatore può preparare una rivincita.'});r.state='lobby';r.deck=[];r.index=0;r.players.forEach(u=>{u.score=0;u.correct=0;u.answers=0});lobby(r);return}
  if(x.type==='settings'){if(r.host!==p||r.state!=='lobby')return send(ws,{type:'error',message:'Solo l’organizzatore può cambiare le impostazioni prima della partita.'});const cat=String(x.category||'Tutte');const cats=new Set(questions.map(q=>q.category));const total=Number(x.total);if(!cats.has(cat)&&cat!=='Tutte')return send(ws,{type:'error',message:'Categoria non disponibile.'});if(![10,15,20,30].includes(total))return send(ws,{type:'error',message:'Durata non valida.'});r.category=cat;r.total=total;lobby(r);return}
- if(x.type==='start'){if(r.host!==p||r.players.length<2||r.state!=='lobby')return send(ws,{type:'error',message:'Servono almeno 2 giocatori; avvia solo l’host.'});const selected=r.category,total=r.total;const pool=questions.filter(q=>selected==='Tutte'||q.category===selected);if(pool.length<total)return send(ws,{type:'error',message:`Questa categoria contiene ${pool.length} domande: ne servono almeno ${total}. Scegli una durata inferiore o un’altra categoria.`});r.deck=shuffle(pool).slice(0,total);r.category=selected;r.index=0;r.players.forEach(u=>u.score=0);next(r);return}
- if(x.type==='answer'&&r.state==='question'){if(r.answered.has(p))return;const val=x.index;if(!Number.isInteger(val)||val<0||val>2)return;r.answered.add(p);if(r.order[val]===r.current.answer){const seconds=Math.max(0,15-(Date.now()-r.started)/1000);p.score+=100+Math.ceil(seconds)*10}send(ws,{type:'answered'});if(r.answered.size===r.players.length)reveal(r)}
+ if(x.type==='start'){if(r.host!==p||r.players.length<2||r.state!=='lobby')return send(ws,{type:'error',message:'Servono almeno 2 giocatori; avvia solo l’host.'});const selected=r.category,total=r.total;const pool=questions.filter(q=>selected==='Tutte'||q.category===selected);if(pool.length<total)return send(ws,{type:'error',message:`Questa categoria contiene ${pool.length} domande: ne servono almeno ${total}. Scegli una durata inferiore o un’altra categoria.`});r.deck=shuffle(pool).slice(0,total);r.category=selected;r.index=0;r.roundId=crypto.randomUUID();r.players.forEach(u=>{u.score=0;u.correct=0;u.answers=0});next(r);return}
+ if(x.type==='answer'&&r.state==='question'){if(r.answered.has(p))return;const val=x.index;if(!Number.isInteger(val)||val<0||val>2)return;r.answered.add(p);p.answers=(p.answers||0)+1;if(r.order[val]===r.current.answer){p.correct=(p.correct||0)+1;const seconds=Math.max(0,15-(Date.now()-r.started)/1000);p.score+=100+Math.ceil(seconds)*10}send(ws,{type:'answered'});if(r.answered.size===r.players.length)reveal(r)}
  });ws.on('close',()=>detach(ws));ws.on('error',()=>detach(ws))});
 setInterval(()=>{for(const ws of wss.clients){if(ws.isAlive===false){ws.terminate();continue}ws.isAlive=false;ws.ping()}},30000).unref();
-httpServer.listen(PORT,()=>{console.log(`Football Legends v0.9 online http://localhost:${PORT} (${questions.length} domande iniziali)`);if(!generated.length||process.env.FORCE_REFRESH==='true')refresh()});
+ranking.init().catch(e=>console.error('Classifiche:',e.message));
+accounts.init().catch(e=>console.error('Account:',e.message));
+httpServer.listen(PORT,()=>{console.log(`Football Legends v1.3 online http://localhost:${PORT} (${questions.length} domande iniziali)`);if(!generated.length||process.env.FORCE_REFRESH==='true')refresh()});
