@@ -16,3 +16,8 @@
 3. Verifica `/api/version` e `/api/status`. **Non eliminare i JSON generati esistenti prima della prima rigenerazione riuscita.**
 
 Le 156 domande aggiuntive sono dati storici stabili; gli aggiornamenti del lunedì non garantiscono nuove domande se le fonti non sono cambiate. Non sono stati verificati qui i download remoti del workflow.
+
+
+## v2.1.2
+- categorie riordinate: campionati, coppe, altri argomenti
+- foto differenziate per Allenatori e tecnici, Calciatori leggendari, Leggende, Curiosità, Europei, Nazionali, Europa/UEFA
