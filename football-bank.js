@@ -76,54 +76,49 @@ function fromSeason(matches,season,category,source){
 }
 // v1.4: Quiz di almanacco su campionati COMPLETATI. Nessun punteggio di
 // partite casuali, nessun dato parziale presentato come classifica ufficiale.
+// v2.2: domande verificate sulle classifiche COMPLETATE, mai risultati casuali.
 function fromCompleteStandings(matches,season,category,source){
- const played=matches.map(info).filter(Boolean);
- const teams=new Map(),fixtureSet=new Set();
+ const played=matches.map(info).filter(Boolean),fixtures=new Set(),teams=new Map();
  for(const m of played){
-  const fixture=m.home+'|'+m.away;
-  if(fixtureSet.has(fixture))return []; // duplicati / fasi playoff
-  fixtureSet.add(fixture);
-  for(const name of [m.home,m.away])if(!teams.has(name))teams.set(name,{name,p:0,points:0,gf:0,ga:0});
-  const h=teams.get(m.home),a=teams.get(m.away);h.p++;a.p++;h.gf+=m.h;h.ga+=m.a;a.gf+=m.a;a.ga+=m.h;
-  if(m.h>m.a)h.points+=3;else if(m.h<m.a)a.points+=3;else{h.points++;a.points++}
+  const key=m.home+'|'+m.away;if(fixtures.has(key))return [];fixtures.add(key);
+  for(const n of [m.home,m.away])if(!teams.has(n))teams.set(n,{name:n,played:0,points:0,w:0,d:0,l:0,gf:0,ga:0,hw:0,aw:0});
+  const h=teams.get(m.home),a=teams.get(m.away);h.played++;a.played++;h.gf+=m.h;h.ga+=m.a;a.gf+=m.a;a.ga+=m.h;
+  if(m.h>m.a){h.points+=3;h.w++;h.hw++;a.l++}else if(m.h<m.a){a.points+=3;a.w++;a.aw++;h.l++}else{h.points++;a.points++;h.d++;a.d++}
  }
- const n=teams.size;
- if(n<10||n>24||played.length!==n*(n-1)||[...teams.values()].some(t=>t.p!==2*(n-1)))return [];
- const t=[...teams.values()].sort((a,b)=>b.points-a.points||b.gf-b.ga-(a.gf-a.ga)||b.gf-a.gf);
- // Non indoviniamo le regole degli spareggi in caso di parita di punti.
- // Si formulano solo confronti dove i punti sono nettamente diversi.
- const lower=(i)=>t.filter(x=>x.points<t[i].points);
- const upper=(i)=>t.filter(x=>x.points>t[i].points);
- const out=[],used=new Set(), ctx=category+' '+season;
- const push=(key,stem,correct,wrong,kind='Almanacco campionati',difficulty=2)=>{
-  const distinct=[...new Set(wrong)].filter(x=>x!==correct);
-  if(distinct.length<2)return;
-  const opts=shuffleDet([correct,...distinct.slice(0,2)],key);
-  const item=q(`almanac|${ctx}|${key}`,category,kind,difficulty,stem,opts,correct,
-   `La risposta è ${correct}. Confronto ricavato dai risultati completi della stagione ${season} (${category}); fonte OpenFootball.`,source);
-  if(item&&!used.has(stem)){used.add(stem);out.push(item)}
- };
- // Fatti centrali della stagione, unicamente quando la squadra ha un
- // vantaggio netto nei punti sulle contendenti.
- if(t[0].points>t[1].points)push('leader',`Quale squadra chiuse al primo posto in ${ctx}?`,t[0].name,t.slice(2).map(x=>x.name),'Campioni e classifiche',1);
- if(t[1].points>t[2].points&&t[0].points>t[1].points)push('second',`Chi arrivò secondo in ${ctx}?`,t[1].name,[t[0].name,...t.slice(3).map(x=>x.name)],'Podio del campionato',2);
- if(t[2].points>t[3].points&&t[1].points>t[2].points)push('third',`Chi arrivò terzo in ${ctx}?`,t[2].name,[t[0].name,...t.slice(4).map(x=>x.name)],'Podio del campionato',2);
- if(t[n-2].points>t[n-1].points)push('last',`Quale squadra chiuse ultima in ${ctx}?`,t[n-1].name,t.slice(0,n-2).map(x=>x.name),'Classifiche storiche',2);
- // Domande variate, sui confronti realmente chiusi. Evita di chiedere
- // la somma dei gol o il risultato di una partita esatta.
- for(let i=0;i<Math.min(n,14);i++){
-  const ahead=lower(i),behind=upper(i);
-  if(ahead.length>=2&&i<Math.floor(n*.7)){
-   const picks=shuffleDet(ahead,ctx+'ahead'+i).slice(0,2);
-   push(`higher-${i}`,`In ${ctx}, quale di queste squadre terminò più in alto?`,t[i].name,picks.map(x=>x.name),'Confronti tra club',i<4?1:2)
-  }
-  if(behind.length>=2&&i>=Math.floor(n*.25)){
-   const picks=shuffleDet(behind,ctx+'behind'+i).slice(0,2);
-   push(`lower-${i}`,`In ${ctx}, quale di queste squadre terminò più in basso?`,t[i].name,picks.map(x=>x.name),'Confronti tra club',2)
-  }
+ const n=teams.size;if(n<10||n>24||played.length!==n*(n-1)||[...teams.values()].some(t=>t.played!==2*(n-1)))return [];
+ const table=[...teams.values()].sort((a,b)=>b.points-a.points||(b.gf-b.ga)-(a.gf-a.ga)||b.gf-a.gf);
+ const out=[],used=new Set(),ctx=category+' '+season;
+ function push(key,kind,stem,correct,distractors,difficulty=2){
+  const wrong=[...new Set(distractors)].filter(x=>x!==correct);
+  if(wrong.length<2||used.has(stem))return;
+  const opts=shuffleDet([correct,...wrong.slice(0,2)],ctx+'|'+key);
+  const it=q('almanac|'+ctx+'|'+key,category,kind,difficulty,stem,opts,correct,
+   'Risposta: '+correct+'. Informazione ricavata dalla classifica completa di '+category+' '+season+' (fonte OpenFootball); non da una singola partita.',source);
+  if(it){out.push(it);used.add(stem)}
+ }
+ // I piazzamenti sono pubblicati soltanto se i PUNTI distinguono chiaramente la posizione.
+ const uniqueRank=i=>(i===0||table[i-1].points>table[i].points)&&(i===n-1||table[i].points>table[i+1].points);
+ if(uniqueRank(0))push('champion','Campioni e classifiche','Chi vinse '+ctx+'?',table[0].name,table.slice(2).map(x=>x.name),1);
+ for(const i of [1,2,3,n-1])if(uniqueRank(i))push('rank'+i,'Podio del campionato','Quale club terminò '+(i===n-1?'ultimo':i===1?'secondo':i===2?'terzo':'quarto')+' in '+ctx+'?',table[i].name,table.filter((_,j)=>j!==i).slice(0,6).map(x=>x.name));
+ // Confronti tre squadre della STESSA stagione, usando separazioni nette di punti.
+ for(let i=0;i<Math.min(n,12);i++){
+  const higher=table.slice(0,i).filter(x=>x.points>table[i].points);
+  const lower=table.slice(i+1).filter(x=>x.points<table[i].points);
+  if(lower.length>=2){const opponents=shuffleDet(lower,ctx+'lower'+i).slice(0,2).map(x=>x.name);
+   push('above'+i,'Confronti tra club','In '+ctx+', quale di questi club terminò più in alto?',table[i].name,opponents,i<4?1:2)}
+  if(higher.length>=2){const opponents=shuffleDet(higher,ctx+'higher'+i).slice(0,2).map(x=>x.name);
+   push('below'+i,'Confronti tra club','In '+ctx+', quale di questi club terminò più in basso?',table[i].name,opponents,2)}
+ }
+ // Record di stagione, unici, controllati sui dati completi.
+ for(const [metric,word,kind] of [['w','più vittorie','Record del campionato'],['gf','più gol nel torneo','Record del campionato'],['ga','meno reti subite','Record del campionato'],['hw','più vittorie casalinghe','Record del campionato'],['aw','più vittorie esterne','Record del campionato']]){
+  const descending=metric!=='ga';const ranked=[...table].sort((a,b)=>descending?b[metric]-a[metric]:a[metric]-b[metric]);
+  if(ranked[0][metric]===ranked[1][metric])continue;
+  const competitors=ranked.slice(1).filter(x=>x[metric]!==ranked[0][metric]);
+  if(competitors.length>=2)push('record-'+metric,kind,'Quale squadra registrò '+word+' in '+ctx+'?',ranked[0].name,shuffleDet(competitors,ctx+metric).slice(0,2).map(x=>x.name),2)
  }
  return out;
 }
+
 function fromWorldCup(data,year,url){
  const matches=Array.isArray(data?.matches)?data.matches:[],category='Mondiali storici',out=[];
  const scorers=new Set();for(const m of matches)for(const goals of [m.goals1,m.goals2])if(Array.isArray(goals))for(const g of goals)if(g?.name&&typeof g.name==='string'&&!g.own_goal&&!g.ownGoal)scorers.add(g.name.trim());
@@ -150,7 +145,7 @@ function combineAndCap(groups,max=50000){ // Diversità per campionato e tipo, s
  return shuffleDet(chosen,'football-legends-50k-v04');
 }
 async function generateQuestions(progress=()=>{},settings={}){
- const start=settings.firstSeason||2010,end=settings.lastSeason||2026,max=settings.max||50000;
+ const start=settings.firstSeason||1990,end=settings.lastSeason||2026,max=settings.max||50000;
  const jobs=[];for(let y=start;y<=end;y++)for(const [file,category] of LEAGUES){const season=`${y}-${String((y+1)%100).padStart(2,'0')}`;jobs.push({url:`${LEAGUE_ROOT}/${season}/${file}.json`,season,category,type:'league'})}
  for(const season of SWISS_SEASONS){
   jobs.push({url:`${SWISS_ROOT}/switzerland_${season}_ch1.json`,season,category:SWISS_CATEGORY,type:'league'});
@@ -160,7 +155,7 @@ async function generateQuestions(progress=()=>{},settings={}){
  }
  // Le finali importanti sono curate in classics-questions.json; non scaricare i risultati casuali dei Mondiali.
  let next=0,ok=0,failed=0,matchCount=0;const groups=[],errors=[],bySource={};
- async function worker(){while(next<jobs.length){const job=jobs[next++];try{const data=await getJson(job.url);if(!Array.isArray(data.matches))throw Error('Missing matches');let qs=[];if(job.type==='league'||job.type==='cup'){const matches=data.matches.filter(m=>info(m));matchCount+=matches.length;if(job.type==='league'){qs.push(...fromCompleteStandings(matches,job.season,job.category,job.url).filter(q=>['Campioni e classifiche','Podio del campionato'].includes(q.kind)))}qs=combineAndCap([qs],1250)}else{qs=[];matchCount+=data.matches.filter(m=>info(m)).length}
+ async function worker(){while(next<jobs.length){const job=jobs[next++];try{const data=await getJson(job.url);if(!Array.isArray(data.matches))throw Error('Missing matches');let qs=[];if(job.type==='league'||job.type==='cup'){const matches=data.matches.filter(m=>info(m));matchCount+=matches.length;if(job.type==='league'){qs.push(...fromCompleteStandings(matches,job.season,job.category,job.url))}qs=combineAndCap([qs],1250)}else{qs=[];matchCount+=data.matches.filter(m=>info(m)).length}
  if(qs.length){groups.push(qs);ok++;bySource[job.type==='league'?job.category:'Mondiali']= (bySource[job.type==='league'?job.category:'Mondiali']||0)+qs.length;progress({source:job.url,questions:qs.length,processed:ok+failed,total:jobs.length})}else failed++}catch(e){failed++;if(errors.length<25)errors.push(`${job.url}: ${e.message}`)}}}
  await Promise.all(Array.from({length:settings.concurrency||10},()=>worker()));// Riserva fino a 5.000 posti alla Super League svizzera senza sacrificare
  // la possibilità di giocare con tutti gli altri campionati. Se la copertura

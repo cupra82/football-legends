@@ -6,7 +6,7 @@ const accounts=require('./accounts-store');
 const extras=require('./people-questions.json');
 const portugal=require('./portugal-questions.json');
 const classics=require('./classics-questions.json');
-const ALLOWED_GENERATED=new Set(['Campioni e classifiche','Podio del campionato']);
+const ALLOWED_GENERATED=new Set(['Campioni e classifiche','Podio del campionato','Confronti tra club','Record del campionato']);
 const qualityFilter=q=>ALLOWED_GENERATED.has(q.kind);
 
 let biographies=[],peopleStats={};
@@ -17,7 +17,7 @@ let generated=[];let snapshotStats={};
 try{const file=JSON.parse(fs.readFileSync(snapshotPath,'utf8'));if(Array.isArray(file.questions)){generated=file.questions;snapshotStats=file.stats||{}}}catch{}
 let questions=[...original,...generated.filter(qualityFilter),...extras,...portugal,...classics,...biographies];let bankStatus={state:generated.length?'ready':'loading',count:questions.length,original:original.length,generated:generated.length,people:extras.length+biographies.length,biographies:biographies.length,hiddenMatchTrivia:generated.filter(q=>!qualityFilter(q)).length,goal:50000,peopleStats,stats:snapshotStats,updatedAt:snapshotStats.at||null};
 let sampleSerial=0;
-function recalc(){const byCategory={},byKind={};for(const q of questions){byCategory[q.category]=(byCategory[q.category]||0)+1;byKind[q.kind||'Storico']=(byKind[q.kind||'Storico']||0)+1}bankStatus.count=questions.length;bankStatus.generated=generated.length;bankStatus.people=extras.length+biographies.length;bankStatus.biographies=biographies.length;bankStatus.hiddenMatchTrivia=generated.filter(q=>!qualityFilter(q)).length;bankStatus.peopleStats=peopleStats;bankStatus.byCategory=byCategory;bankStatus.byKind=byKind}
+function recalc(){const byCategory={},byKind={};for(const q of questions){byCategory[q.category]=(byCategory[q.category]||0)+1;byKind[q.kind||'Storico']=(byKind[q.kind||'Storico']||0)+1}bankStatus.count=questions.length;bankStatus.generated=generated.length;bankStatus.people=extras.length+biographies.length;bankStatus.biographies=biographies.length;bankStatus.hiddenMatchTrivia=generated.filter(q=>!qualityFilter(q)).length;bankStatus.peopleStats=peopleStats;bankStatus.byCategory=byCategory;bankStatus.byKind=byKind;bankStatus.categoryTargets=Object.fromEntries(Object.entries(byCategory).filter(([name])=>!['Tutte','Calciatori nel mondo'].includes(name)).map(([name,count])=>[name,{available:count,target:1000,missing:Math.max(0,1000-count)}]));}
 recalc();
 function shuffle(a){a=[...a];for(let i=a.length-1;i>0;i--){const j=crypto.randomInt(i+1);[a[i],a[j]]=[a[j],a[i]]}return a}
 function samplePool(max=2500){if(questions.length<=max)return questions;const groups=new Map();for(const q of questions){if(!groups.has(q.category))groups.set(q.category,[]);groups.get(q.category).push(q)}
@@ -78,7 +78,7 @@ const httpServer=http.createServer((req,res)=>{
  }
  if(pathname==='/api/leaderboard/status'){res.writeHead(200,{'Content-Type':'application/json; charset=utf-8','Cache-Control':'no-store'});return res.end(JSON.stringify(ranking.status()))}
  if(pathname==='/api/leaderboard'){res.writeHead(200,{'Content-Type':'application/json; charset=utf-8','Cache-Control':'no-store'});return ranking.leaderboard(30).then(rows=>res.end(JSON.stringify({status:ranking.status(),players:rows}))).catch(e=>res.end(JSON.stringify({status:{...ranking.status(),ready:false},players:[]})))}
- if(pathname==='/api/version'){res.writeHead(200,{'Content-Type':'application/json; charset=utf-8','Cache-Control':'no-store'});return res.end(JSON.stringify({version:'2.1.1',game:'Football Legends',state:bankStatus.state,questions:bankStatus.count}))}
+ if(pathname==='/api/version'){res.writeHead(200,{'Content-Type':'application/json; charset=utf-8','Cache-Control':'no-store'});return res.end(JSON.stringify({version:'2.2.0',game:'Football Legends',state:bankStatus.state,questions:bankStatus.count}))}
  if(pathname==='/api/status'){res.writeHead(200,{'Content-Type':'application/json; charset=utf-8','Cache-Control':'no-store'});return res.end(JSON.stringify(bankStatus))}
  // File immagine locali: serviti dal server Node.js con percorso ristretto e tipo MIME corretto.
  if(/^\/assets\/categories\/[a-z0-9-]+\.webp$/.test(pathname)){
@@ -99,7 +99,7 @@ function code(){let c;do{c=crypto.randomBytes(4).toString('hex').slice(0,6).toUp
 function clean(n){return String(n||'Campione').replace(/[<>\x00-\x1f]/g,'').trim().slice(0,20)||'Campione'}
 function summary(r){return [...r.players].sort((a,b)=>b.score-a.score).map(p=>({name:p.name,score:p.score}))}
 function seriesBoard(r){return [...r.players].map(p=>({name:p.name,wins:p.wins||0,points:p.seriesPoints||0})).sort((a,b)=>b.wins-a.wins||b.points-a.points)}
-function lobby(r){r.players.forEach(p=>send(p.ws,{type:'lobby',code:r.code,hostForYou:r.host===p,players:r.players.map(q=>({name:q.name,host:q===r.host})),category:r.category,total:r.total,phase:r.state,rounds:r.rounds||0,series:seriesBoard(r)}))}
+function lobby(r){const categoryAvailable=r.category==='Tutte'?questions.length:questions.filter(q=>q.category===r.category).length;const bonusCount=Math.max(0,r.total-categoryAvailable);r.players.forEach(p=>send(p.ws,{type:'lobby',code:r.code,hostForYou:r.host===p,players:r.players.map(q=>({name:q.name,host:q===r.host})),category:r.category,total:r.total,categoryAvailable,bonusCount,phase:r.state,rounds:r.rounds||0,series:seriesBoard(r)}))}
 function clearRoom(r){clearTimeout(r.timer);rooms.delete(r.code);r.players.forEach(p=>clients.delete(p.ws))}
 async function finish(r){
  if(!rooms.has(r.code)||r.state==='results'||r.state==='saving')return;
@@ -123,10 +123,19 @@ wss.on('connection',ws=>{ws.isAlive=true;ws.on('pong',()=>ws.isAlive=true);ws.on
  if(x.type==='profile'){ranking.profile(p.id).then(profile=>send(ws,{type:'profile',profile,status:ranking.status()})).catch(()=>send(ws,{type:'profile',profile:null,status:ranking.status()}));return}
  if(x.type==='rematch'){if(r.host!==p||r.state!=='results')return send(ws,{type:'error',message:'Solo l’organizzatore può preparare una rivincita.'});r.state='lobby';r.deck=[];r.index=0;r.players.forEach(u=>{u.score=0;u.correct=0;u.answers=0});lobby(r);return}
  if(x.type==='settings'){if(r.host!==p||r.state!=='lobby')return send(ws,{type:'error',message:'Solo l’organizzatore può cambiare le impostazioni prima della partita.'});const cat=String(x.category||'Tutte');const cats=new Set(questions.map(q=>q.category));const total=Number(x.total);if(!cats.has(cat)&&cat!=='Tutte')return send(ws,{type:'error',message:'Categoria non disponibile.'});if(![10,15,20,30].includes(total))return send(ws,{type:'error',message:'Durata non valida.'});r.category=cat;r.total=total;lobby(r);return}
- if(x.type==='start'){if(r.host!==p||r.players.length<2||r.state!=='lobby')return send(ws,{type:'error',message:'Servono almeno 2 giocatori; avvia solo l’host.'});const selected=r.category,total=r.total;const pool=questions.filter(q=>selected==='Tutte'||q.category===selected);if(pool.length<total)return send(ws,{type:'error',message:`Questa categoria contiene ${pool.length} domande: ne servono almeno ${total}. Scegli una durata inferiore o un’altra categoria.`});r.deck=selected==='Tutte'?balancedDeck(pool,total):shuffle(pool).slice(0,total);r.category=selected;r.index=0;r.roundId=crypto.randomUUID();r.players.forEach(u=>{u.score=0;u.correct=0;u.answers=0});next(r);return}
+ if(x.type==='start'){if(r.host!==p||r.players.length<2||r.state!=='lobby')return send(ws,{type:'error',message:'Servono almeno 2 giocatori; avvia solo l’host.'});const selected=r.category,total=r.total;const pool=questions.filter(q=>selected==='Tutte'||q.category===selected);if(!pool.length)return send(ws,{type:'error',message:'Nessuna domanda disponibile in questa categoria.'});if(questions.length<total)return send(ws,{type:'error',message:'Archivio insufficiente per questa durata.'});
+ const categoryDeck=selected==='Tutte'?balancedDeck(pool,total):shuffle(pool).slice(0,total);
+ if(categoryDeck.length<total){
+   const selectedIds=new Set(categoryDeck.map(q=>q.id||q.question));
+   const rest=questions.filter(q=>q.category!==selected&&!selectedIds.has(q.id||q.question));
+   const extra=balancedDeck(rest,total-categoryDeck.length);
+   if(extra.length<total-categoryDeck.length)return send(ws,{type:'error',message:'Non ci sono abbastanza domande diverse per questa durata.'});
+   categoryDeck.push(...extra);
+ }
+ r.deck=shuffle(categoryDeck);r.category=selected;r.index=0;r.roundId=crypto.randomUUID();r.players.forEach(u=>{u.score=0;u.correct=0;u.answers=0});next(r);return}
  if(x.type==='answer'&&r.state==='question'){if(r.answered.has(p))return;const val=x.index;if(!Number.isInteger(val)||val<0||val>2)return;r.answered.add(p);p.answers=(p.answers||0)+1;if(r.order[val]===r.current.answer){p.correct=(p.correct||0)+1;const seconds=Math.max(0,15-(Date.now()-r.started)/1000);p.score+=100+Math.ceil(seconds)*10}send(ws,{type:'answered'});if(r.answered.size===r.players.length)reveal(r)}
  });ws.on('close',()=>detach(ws));ws.on('error',()=>detach(ws))});
 setInterval(()=>{for(const ws of wss.clients){if(ws.isAlive===false){ws.terminate();continue}ws.isAlive=false;ws.ping()}},30000).unref();
 ranking.init().catch(e=>console.error('Classifiche:',e.message));
 accounts.init().catch(e=>console.error('Account:',e.message));
-httpServer.listen(PORT,()=>{console.log(`Football Legends v1.4 online http://localhost:${PORT} (${questions.length} domande iniziali)`);if(!generated.length||process.env.FORCE_REFRESH==='true')refresh()});
+httpServer.listen(PORT,()=>{console.log(`Football Legends v2.1.7 online http://localhost:${PORT} (${questions.length} domande iniziali)`);if(!generated.length||process.env.FORCE_REFRESH==='true')refresh()});
