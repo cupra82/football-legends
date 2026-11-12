@@ -8,6 +8,7 @@ const portugal=require('./portugal-questions.json');
 const classics=require('./classics-questions.json');
 const official=require('./official-questions.json');
 const historyExpansion=require('./history-expansion.json');
+const deepHistory=require('./deep-history.json');
 let wikiQuestions=[];let wikidataStats={};
 try{const d=JSON.parse(fs.readFileSync(path.join(__dirname,'wikidata-generated.json'),'utf8'));if(Array.isArray(d.questions)){wikiQuestions=d.questions;wikidataStats=d.stats||{}}}catch{}
 const categoryPolicy=require('./category-policy.json');
@@ -21,7 +22,7 @@ const original=JSON.parse(fs.readFileSync(path.join(__dirname,'questions.json'),
 const snapshotPath=path.join(__dirname,'questions-generated.json');
 let generated=[];let snapshotStats={};
 try{const file=JSON.parse(fs.readFileSync(snapshotPath,'utf8'));if(Array.isArray(file.questions)){generated=file.questions;snapshotStats=file.stats||{}}}catch{}
-let questions=[...original,...generated.filter(qualityFilter),...extras,...portugal,...classics,...official,...historyExpansion,...wikiQuestions,...biographies].filter(q=>q.category!=='Calcio femminile');let bankStatus={state:generated.length?'ready':'loading',count:questions.length,original:original.length,generated:generated.length,people:extras.length+biographies.length,biographies:biographies.length,hiddenMatchTrivia:generated.filter(q=>!qualityFilter(q)).length,goal:50000,peopleStats,wikidataStats,official:official.length,wikidata:wikiQuestions.length,stats:snapshotStats,updatedAt:snapshotStats.at||null};
+let questions=[...original,...generated.filter(qualityFilter),...extras,...portugal,...classics,...official,...historyExpansion,...deepHistory,...wikiQuestions,...biographies].filter(q=>q.category!=='Calcio femminile');let bankStatus={state:generated.length?'ready':'loading',count:questions.length,original:original.length,generated:generated.length,people:extras.length+biographies.length,biographies:biographies.length,hiddenMatchTrivia:generated.filter(q=>!qualityFilter(q)).length,goal:50000,peopleStats,wikidataStats,official:official.length,wikidata:wikiQuestions.length,stats:snapshotStats,updatedAt:snapshotStats.at||null};
 let sampleSerial=0;
 function recalc(){const byCategory={},byKind={};for(const q of questions){byCategory[q.category]=(byCategory[q.category]||0)+1;byKind[q.kind||'Storico']=(byKind[q.kind||'Storico']||0)+1}bankStatus.count=questions.length;bankStatus.generated=generated.length;bankStatus.people=extras.length+biographies.length;bankStatus.biographies=biographies.length;bankStatus.hiddenMatchTrivia=generated.filter(q=>!qualityFilter(q)).length;bankStatus.peopleStats=peopleStats;bankStatus.wikidataStats=wikidataStats;bankStatus.official=official.length;bankStatus.wikidata=wikiQuestions.length;bankStatus.byCategory=byCategory;bankStatus.byKind=byKind;const planned=Object.values(categoryPolicy.groups).flat();const allNames=[...new Set([...planned,...Object.keys(byCategory)])];bankStatus.categoryTargets=Object.fromEntries(allNames.map(name=>{const count=byCategory[name]||0;return [name,{available:count,target:categoryPolicy.minimumPerCategory,missing:Math.max(0,categoryPolicy.minimumPerCategory-count),met:count>=categoryPolicy.minimumPerCategory}]}));}
 recalc();
@@ -53,7 +54,7 @@ function balancedDeck(pool,total){
 }
 let refreshing=false;
 async function refresh(){if(refreshing)return;refreshing=true;bankStatus.state=questions.length>1000?'ready':'loading';try{let result=await generateQuestions(()=>{});if(result.questions.length<20)throw Error(`Solo ${result.questions.length} domande da classifiche complete; archivio precedente conservato`);
- generated=result.questions;questions=[...original,...generated.filter(qualityFilter),...extras,...portugal,...classics,...official,...historyExpansion,...wikiQuestions,...biographies].filter(q=>q.category!=='Calcio femminile');bankStatus={...bankStatus,state:'ready',stats:result.stats,updatedAt:new Date().toISOString(),error:null};recalc();console.log(`Football Legends: ${questions.length} domande, ${result.stats.sourcesSuccessful} fonti dati caricate`);
+ generated=result.questions;questions=[...original,...generated.filter(qualityFilter),...extras,...portugal,...classics,...official,...historyExpansion,...deepHistory,...wikiQuestions,...biographies].filter(q=>q.category!=='Calcio femminile');bankStatus={...bankStatus,state:'ready',stats:result.stats,updatedAt:new Date().toISOString(),error:null};recalc();console.log(`Football Legends: ${questions.length} domande, ${result.stats.sourcesSuccessful} fonti dati caricate`);
  // Salvataggio locale opportunistico: su Render Free non è persistente ai redeploy.
  try{fs.writeFileSync(snapshotPath,JSON.stringify({stats:result.stats,questions:generated}))}catch{}
  }catch(e){bankStatus.state=questions.length>1000?'ready':'fallback';bankStatus.error=e.message;console.error('Database: '+e.message)}finally{refreshing=false}}
@@ -88,7 +89,7 @@ const httpServer=http.createServer((req,res)=>{
  if(pathname==='/api/leaderboard/status'){res.writeHead(200,{'Content-Type':'application/json; charset=utf-8','Cache-Control':'no-store'});return res.end(JSON.stringify(ranking.status()))}
  if(pathname==='/api/leaderboard'){res.writeHead(200,{'Content-Type':'application/json; charset=utf-8','Cache-Control':'no-store'});return ranking.leaderboard(30).then(rows=>res.end(JSON.stringify({status:ranking.status(),players:rows}))).catch(e=>res.end(JSON.stringify({status:{...ranking.status(),ready:false},players:[]})))}
  if(pathname==='/api/topics'){res.writeHead(200,{'Content-Type':'application/json; charset=utf-8','Cache-Control':'no-store'});return res.end(JSON.stringify({groups:topicFilters.counts(questions),available:questions.length}));}
- if(pathname==='/api/version'){res.writeHead(200,{'Content-Type':'application/json; charset=utf-8','Cache-Control':'no-store'});return res.end(JSON.stringify({version:'3.3.4',game:'Football Legends',state:bankStatus.state,questions:bankStatus.count}))}
+ if(pathname==='/api/version'){res.writeHead(200,{'Content-Type':'application/json; charset=utf-8','Cache-Control':'no-store'});return res.end(JSON.stringify({version:'3.3.5',game:'Football Legends',state:bankStatus.state,questions:bankStatus.count}))}
  if(pathname==='/api/status'){res.writeHead(200,{'Content-Type':'application/json; charset=utf-8','Cache-Control':'no-store'});return res.end(JSON.stringify(bankStatus))}
  // File immagine locali: serviti dal server Node.js con percorso ristretto e tipo MIME corretto.
  if(/^\/assets\/categories\/[a-z0-9-]+\.webp$/.test(pathname)){
@@ -148,4 +149,4 @@ wss.on('connection',ws=>{ws.isAlive=true;ws.on('pong',()=>ws.isAlive=true);ws.on
 setInterval(()=>{for(const ws of wss.clients){if(ws.isAlive===false){ws.terminate();continue}ws.isAlive=false;ws.ping()}},30000).unref();
 ranking.init().catch(e=>console.error('Classifiche:',e.message));
 accounts.init().catch(e=>console.error('Account:',e.message));
-httpServer.listen(PORT,()=>{console.log(`Football Legends v3.3.1 online http://localhost:${PORT} (${questions.length} domande iniziali)`);if(!generated.length||process.env.FORCE_REFRESH==='true')refresh()});
+httpServer.listen(PORT,()=>{console.log(`Football Legends v3.3.5 online http://localhost:${PORT} (${questions.length} domande iniziali)`);if(!generated.length||process.env.FORCE_REFRESH==='true')refresh()});

@@ -1,8 +1,8 @@
 {
   "name": "football-legends",
-  "version": "3.3.4",
+  "version": "3.3.5",
   "private": true,
-  "description": "Football Legends 3.3.4 — conteggi delle categorie sull’intero archivio e caricamento delle domande per argomento",
+  "description": "Football Legends 3.3.5 — nuove domande storiche su Coppa dei Campioni, Mondiali ed Europei",
   "scripts": {
     "start": "node server.js"
   },

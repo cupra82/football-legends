@@ -25,6 +25,8 @@ jobs:
         run: node scripts/build-history-expansion.js --check
       - name: Verifica dati storici UEFA/FIFA
         run: node scripts/build-official.js --check
+      - name: Verifica nuovo archivio storico Champions Mondiali Europei
+        run: node scripts/test-deep-history.js
       - name: Controlla numero e qualità di ogni categoria
         run: node scripts/audit-categories.js
       - name: Pubblica solo se cambia il dataset
