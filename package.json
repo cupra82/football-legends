@@ -1,8 +1,8 @@
 {
   "name": "football-legends",
-  "version": "2.0.0",
+  "version": "3.1.0",
   "private": true,
-  "description": "Football Legends 2.0 \u2014 quiz storico, grandi club, campioni, premi e classifiche verificate senza risultati casuali",
+  "description": "Football Legends 3.1 — Wikidata CC0 e archivi ufficiali UEFA/FIFA",
   "scripts": {
     "start": "node server.js"
   },

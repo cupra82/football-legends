@@ -19,11 +19,17 @@ jobs:
       - run: node scripts/build-bank.js
       - name: Genera domande su calciatori e allenatori
         run: node scripts/build-people.js
+      - name: Genera quesiti Wikidata (se il servizio è disponibile)
+        run: node scripts/build-wikidata.js
+      - name: Verifica dati storici UEFA/FIFA
+        run: node scripts/build-official.js --check
+      - name: Controlla numero e qualità di ogni categoria
+        run: node scripts/audit-categories.js
       - name: Pubblica solo se cambia il dataset
         run: |
           git config user.name 'football-legends-bot'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add questions-generated.json people-generated.json
+          git add questions-generated.json people-generated.json wikidata-generated.json category-report.json category-report.md
           if ! git diff --cached --quiet; then
             git commit -m 'Aggiorna archivio domande dal calcio storico'
             git push
