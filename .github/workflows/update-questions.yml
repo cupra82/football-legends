@@ -8,7 +8,7 @@ permissions:
 jobs:
   update:
     runs-on: ubuntu-latest
-    timeout-minutes: 35
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -20,7 +20,11 @@ jobs:
       - run: node scripts/build-bank.js
       - name: Genera domande su calciatori e allenatori
         run: node scripts/build-people.js
-      - name: Genera quesiti Wikidata (se il servizio è disponibile)
+      - name: Genera quesiti Wikidata (con limiti e salvataggi)
+        env:
+          FL_WIKIDATA_REQUEST_TIMEOUT_MS: '12000'
+          FL_WIKIDATA_BUDGET_MS: '240000'
+          FL_CLUBS_PER_RUN: '24'
         run: node scripts/build-wikidata.js
       - name: Verifica archivio storico espanso
         run: node scripts/build-history-expansion.js --check
