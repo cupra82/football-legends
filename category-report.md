@@ -2,7 +2,7 @@
 
 Versione generatore: **2.3.0**
 
-Totale sorgenti lette: **22803** · Domande valide, uniche e giocabili: **22743**
+Totale sorgenti lette: **28615** · Domande valide, uniche e giocabili: **28555**
 
 Filtrate per tipo non desiderato: **0** · Duplicati: **60** · Non valide: **0**
 
@@ -29,7 +29,7 @@ Filtrate per tipo non desiderato: **0** · Duplicati: **60** · Non valide: **0*
 | Coppe e tornei | Marcatori dei Mondiali | 0 | 2000 | 2000 | Da ampliare |
 | Coppe e tornei | Coppa Svizzera | 0 | 2000 | 2000 | Da ampliare |
 | Protagonisti e storia | Pallone d’Oro | 70 | 2000 | 1930 | Da ampliare |
-| Protagonisti e storia | Calciatori nel mondo | 20000 | 2000 | 0 | OK |
+| Protagonisti e storia | Calciatori nel mondo | 25812 | 2000 | 0 | OK |
 | Protagonisti e storia | Calciatori leggendari | 51 | 2000 | 1949 | Da ampliare |
 | Protagonisti e storia | Leggende | 12 | 2000 | 1988 | Da ampliare |
 | Protagonisti e storia | Leggende del calcio | 15 | 2000 | 1985 | Da ampliare |
@@ -57,7 +57,7 @@ Filtrate per tipo non desiderato: **0** · Duplicati: **60** · Non valide: **0*
 - classics-questions.json: 156 elementi
 - questions-generated.json: 1409 elementi
 - people-generated.json: 18000 elementi
-- wikidata-generated.json: 2758 elementi
+- wikidata-generated.json: 8570 elementi
 - official-questions.json: 67 elementi
 
 ## Criterio di qualità

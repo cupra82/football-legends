@@ -1,6 +1,6 @@
 {
   "version": "2.3.0",
-  "generatedAt": "2026-11-12T08:30:40.982Z",
+  "generatedAt": "2026-11-12T08:42:04.565Z",
   "minimumPerCategory": 2000,
   "sourceStats": {
     "questions.json": {
@@ -29,15 +29,15 @@
     },
     "wikidata-generated.json": {
       "present": true,
-      "loaded": 2758
+      "loaded": 8570
     },
     "official-questions.json": {
       "present": true,
       "loaded": 67
     }
   },
-  "rawCount": 22803,
-  "validUniquePlayable": 22743,
+  "rawCount": 28615,
+  "validUniquePlayable": 28555,
   "filteredByKind": 0,
   "invalid": 0,
   "duplicates": 60,
@@ -65,10 +65,10 @@
     "Epoca dei protagonisti": 5758,
     "Nazionalità": 6426,
     "Ruolo": 5757,
-    "Carriere Wikidata": 706,
-    "Biografie Wikidata": 706,
-    "Città di nascita Wikidata": 699,
-    "Nazionalità Wikidata": 647,
+    "Carriere Wikidata": 2227,
+    "Biografie Wikidata": 2228,
+    "Città di nascita Wikidata": 2103,
+    "Nazionalità Wikidata": 2012,
     "Albi d’oro ufficiali": 67
   },
   "categories": [
@@ -227,7 +227,7 @@
     {
       "group": "Protagonisti e storia",
       "category": "Calciatori nel mondo",
-      "available": 20000,
+      "available": 25812,
       "target": 2000,
       "missing": 0,
       "met": true
