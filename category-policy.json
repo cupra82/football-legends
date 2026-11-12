@@ -1,5 +1,5 @@
 {
-  "version": "2.3.0",
+  "version": "3.3.4",
   "minimumPerCategory": 2000,
   "groups": {
     "Campionati": [
@@ -39,7 +39,6 @@
       "Curiosità",
       "Derby e rivalità",
       "Grandi club",
-      "Calcio femminile",
       "Europa"
     ]
   },

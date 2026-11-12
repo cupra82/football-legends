@@ -1,8 +1,8 @@
 {
   "name": "football-legends",
-  "version": "3.3.2",
+  "version": "3.3.4",
   "private": true,
-  "description": "Football Legends 3.3.2 — conteggi delle categorie sull’intero archivio e caricamento delle domande per argomento",
+  "description": "Football Legends 3.3.4 — conteggi delle categorie sull’intero archivio e caricamento delle domande per argomento",
   "scripts": {
     "start": "node server.js"
   },

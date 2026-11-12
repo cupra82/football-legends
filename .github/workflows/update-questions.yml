@@ -21,6 +21,8 @@ jobs:
         run: node scripts/build-people.js
       - name: Genera quesiti Wikidata (se il servizio è disponibile)
         run: node scripts/build-wikidata.js
+      - name: Verifica archivio storico espanso
+        run: node scripts/build-history-expansion.js --check
       - name: Verifica dati storici UEFA/FIFA
         run: node scripts/build-official.js --check
       - name: Controlla numero e qualità di ogni categoria
