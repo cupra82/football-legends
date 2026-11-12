@@ -77,14 +77,17 @@ const httpServer=http.createServer((req,res)=>{
  if(pathname.startsWith('/api/account/')){if(req.method!=='POST')return jsonReply(res,405,{error:'Metodo non consentito'});return accountRequest(req,res,pathname)}
 
  if(pathname==='/api/questions'){
-  const u=new URL(req.url,'http://localhost');let limit=Math.min(3500,Math.max(100,Number(u.searchParams.get('limit'))||2500));
-  const selected=samplePool(limit);res.writeHead(200,{'Content-Type':'application/json; charset=utf-8','Cache-Control':'no-store'});
-  return res.end(JSON.stringify({questions:selected,status:bankStatus,served: selected.length}));
+  const u=new URL(req.url,'http://localhost');let limit=Math.min(3500,Math.max(10,Number(u.searchParams.get('limit'))||2500));
+  const category=u.searchParams.get('category')||'Tutte';
+  if(!topicFilters.valid(category))return jsonReply(res,400,{error:'Categoria non valida'});
+  const eligible=category==='Tutte'?questions:questions.filter(q=>topicFilters.matches(category,q));
+  const selected=category==='Tutte'?samplePool(limit):balancedDeck(eligible,Math.min(limit,eligible.length));
+  return jsonReply(res,200,{questions:selected,available:eligible.length,category,status:bankStatus,served:selected.length});
  }
  if(pathname==='/api/leaderboard/status'){res.writeHead(200,{'Content-Type':'application/json; charset=utf-8','Cache-Control':'no-store'});return res.end(JSON.stringify(ranking.status()))}
  if(pathname==='/api/leaderboard'){res.writeHead(200,{'Content-Type':'application/json; charset=utf-8','Cache-Control':'no-store'});return ranking.leaderboard(30).then(rows=>res.end(JSON.stringify({status:ranking.status(),players:rows}))).catch(e=>res.end(JSON.stringify({status:{...ranking.status(),ready:false},players:[]})))}
  if(pathname==='/api/topics'){res.writeHead(200,{'Content-Type':'application/json; charset=utf-8','Cache-Control':'no-store'});return res.end(JSON.stringify({groups:topicFilters.counts(questions),available:questions.length}));}
- if(pathname==='/api/version'){res.writeHead(200,{'Content-Type':'application/json; charset=utf-8','Cache-Control':'no-store'});return res.end(JSON.stringify({version:'3.3.1',game:'Football Legends',state:bankStatus.state,questions:bankStatus.count}))}
+ if(pathname==='/api/version'){res.writeHead(200,{'Content-Type':'application/json; charset=utf-8','Cache-Control':'no-store'});return res.end(JSON.stringify({version:'3.3.2',game:'Football Legends',state:bankStatus.state,questions:bankStatus.count}))}
  if(pathname==='/api/status'){res.writeHead(200,{'Content-Type':'application/json; charset=utf-8','Cache-Control':'no-store'});return res.end(JSON.stringify(bankStatus))}
  // File immagine locali: serviti dal server Node.js con percorso ristretto e tipo MIME corretto.
  if(/^\/assets\/categories\/[a-z0-9-]+\.webp$/.test(pathname)){
