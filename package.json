@@ -1,0 +1,16 @@
+{
+  "name": "football-legends",
+  "version": "3.3.1",
+  "private": true,
+  "description": "Football Legends 3.3.1 — pacchetto completo: menu 12 categorie, scoperta club Wikidata, versioni corrette",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "ws": "^8.18.0",
+    "pg": "^8.13.1"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

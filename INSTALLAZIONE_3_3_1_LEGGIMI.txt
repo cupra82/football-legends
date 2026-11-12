@@ -1,0 +1,17 @@
+FOOTBALL LEGENDS v3.3.1 — PACCHETTO COMPLETO
+
+Contiene tutti i file applicativi: index.html, server.js, package.json, sorgenti delle domande, scripts/, assets/, .github/workflows/, configurazione Render e test.
+
+ATTENZIONE: i due grandi dataset people-generated.json e questions-generated.json NON SONO nello ZIP, perché sono stati generati dal tuo repository e non sono presenti nei file locali che abbiamo a disposizione. NON CANCELLARLI: lasciali nel repository quando copi lo ZIP sopra i file esistenti. Se esiste wikidata-generated.json, conservalo ugualmente. La pubblicazione del codice non crea automaticamente migliaia di nuove domande.
+
+COME AGGIORNARE:
+1) In GitHub Desktop seleziona il repository cupra82/football-legends e fai Fetch origin, quindi Pull origin quando disponibile.
+2) Repository > Show in Explorer.
+3) Apri la cartella estratta FOOTBALL_LEGENDS_v3_3_1_COMPLETO e seleziona TUTTI i suoi file e cartelle (anche .github, che potrebbe risultare nascosta). Copiali nella RADICE del repository, NON dentro una nuova sottocartella.
+4) Conferma 'Sostituisci i file nella destinazione'. Non cancellare prima la cartella esistente; conserva people-generated.json, questions-generated.json e tutti gli altri *-generated.json.
+5) Torna in GitHub Desktop, verifica che fra i cambiamenti compaiano index.html, server.js, package.json, scripts/build-wikidata.js, .github/workflows/update-questions.yml e cartella assets.
+6) Summary: Football Legends 3.3.1 completo. Poi Commit to main e Push origin.
+7) Su Render, attendi lo stato Live e controlla https://football-legends-okp1.onrender.com/api/version : dovrebbe mostrare 3.3.1. Poi apri la homepage e premi CTRL+SHIFT+R.
+8) Per nuove domande: GitHub > Actions > Aggiorna archivio Football Legends > Run workflow. Controlla che esca verde; il dataset nuovo può non crescere se le fonti sono limitate.
+
+NOTE: la grafica delle categorie non è stata modificata. La v3.3.1 corregge anche il numero di versione visibile; la v3.3 mostrava per errore '3.0'. Il workflow processa progressivamente 2 paesi e 12 nuovi club per esecuzione (parametri configurabili). Non abbiamo certificato che tutte le squadre del mondo siano già indicizzate.
