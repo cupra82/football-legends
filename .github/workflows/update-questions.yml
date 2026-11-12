@@ -8,7 +8,7 @@ permissions:
 jobs:
   update:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 35
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -29,7 +29,7 @@ jobs:
         run: |
           git config user.name 'football-legends-bot'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add questions-generated.json people-generated.json wikidata-generated.json category-report.json category-report.md
+          git add questions-generated.json people-generated.json wikidata-generated.json wikidata-clubs.json wikidata-club-cache.json category-report.json category-report.md
           if ! git diff --cached --quiet; then
             git commit -m 'Aggiorna archivio domande dal calcio storico'
             git push

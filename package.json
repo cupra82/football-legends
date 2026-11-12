@@ -1,8 +1,8 @@
 {
   "name": "football-legends",
-  "version": "3.1.0",
+  "version": "3.3.0",
   "private": true,
-  "description": "Football Legends 3.1 — Wikidata CC0 e archivi ufficiali UEFA/FIFA",
+  "description": "Football Legends 3.3 — discovery club Wikidata progressiva",
   "scripts": {
     "start": "node server.js"
   },
