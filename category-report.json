@@ -1,6 +1,6 @@
 {
-  "version": "2.3.0",
-  "generatedAt": "2026-11-12T08:42:04.565Z",
+  "version": "3.3.4",
+  "generatedAt": "2026-11-12T09:38:30.940Z",
   "minimumPerCategory": 2000,
   "sourceStats": {
     "questions.json": {
@@ -29,20 +29,28 @@
     },
     "wikidata-generated.json": {
       "present": true,
-      "loaded": 8570
+      "loaded": 28874
     },
     "official-questions.json": {
       "present": true,
       "loaded": 67
+    },
+    "history-expansion.json": {
+      "present": true,
+      "loaded": 483
+    },
+    "deep-history.json": {
+      "present": true,
+      "loaded": 350
     }
   },
-  "rawCount": 28615,
-  "validUniquePlayable": 28555,
-  "filteredByKind": 0,
+  "rawCount": 49752,
+  "validUniquePlayable": 49686,
+  "filteredByKind": 6,
   "invalid": 0,
   "duplicates": 60,
   "byKind": {
-    "Storico": 131,
+    "Storico": 125,
     "Storia e curiosità": 99,
     "Vincitore per anno": 70,
     "Premi calciatori": 38,
@@ -65,11 +73,35 @@
     "Epoca dei protagonisti": 5758,
     "Nazionalità": 6426,
     "Ruolo": 5757,
-    "Carriere Wikidata": 2227,
-    "Biografie Wikidata": 2228,
-    "Città di nascita Wikidata": 2103,
-    "Nazionalità Wikidata": 2012,
-    "Albi d’oro ufficiali": 67
+    "Carriere Wikidata": 7520,
+    "Biografie Wikidata": 7541,
+    "Città di nascita Wikidata": 7174,
+    "Nazionalità Wikidata": 6639,
+    "Albi d’oro ufficiali": 67,
+    "Finali mondiali": 22,
+    "Paesi ospitanti": 39,
+    "Finali Europei": 17,
+    "Finali Champions": 32,
+    "Anni dei premiati": 46,
+    "Record Pallone d’Oro": 10,
+    "Club e stadi": 122,
+    "Rivalità storiche": 28,
+    "Leggende e club": 92,
+    "Leggende e nazionali": 92,
+    "Allenatori campioni": 22,
+    "Finali storiche": 38,
+    "Grandi marcatori": 20,
+    "Record e gol": 20,
+    "Coppa dei Campioni": 37,
+    "Finali di un tempo": 37,
+    "Allenatori europei": 32,
+    "Sedi delle finali": 32,
+    "Coppa UEFA ed Europa League": 25,
+    "Finaliste Europa League": 25,
+    "Allenatori campioni d’Europa": 17,
+    "Marcatori Europei": 10,
+    "Gol e primati": 10,
+    "Miglior giocatore": 8
   },
   "categories": [
     {
@@ -171,9 +203,9 @@
     {
       "group": "Coppe e tornei",
       "category": "Champions League",
-      "available": 71,
+      "available": 291,
       "target": 2000,
-      "missing": 1929,
+      "missing": 1709,
       "met": false
     },
     {
@@ -187,9 +219,9 @@
     {
       "group": "Coppe e tornei",
       "category": "Mondiali",
-      "available": 59,
+      "available": 186,
       "target": 2000,
-      "missing": 1941,
+      "missing": 1814,
       "met": false
     },
     {
@@ -219,15 +251,15 @@
     {
       "group": "Protagonisti e storia",
       "category": "Pallone d’Oro",
-      "available": 70,
+      "available": 126,
       "target": 2000,
-      "missing": 1930,
+      "missing": 1874,
       "met": false
     },
     {
       "group": "Protagonisti e storia",
       "category": "Calciatori nel mondo",
-      "available": 25812,
+      "available": 46116,
       "target": 2000,
       "missing": 0,
       "met": true
@@ -251,9 +283,9 @@
     {
       "group": "Protagonisti e storia",
       "category": "Leggende del calcio",
-      "available": 15,
+      "available": 199,
       "target": 2000,
-      "missing": 1985,
+      "missing": 1801,
       "met": false
     },
     {
@@ -299,9 +331,9 @@
     {
       "group": "Altro",
       "category": "Derby e rivalità",
-      "available": 11,
+      "available": 39,
       "target": 2000,
-      "missing": 1989,
+      "missing": 1961,
       "met": false
     },
     {
@@ -310,14 +342,6 @@
       "available": 0,
       "target": 2000,
       "missing": 2000,
-      "met": false
-    },
-    {
-      "group": "Altro",
-      "category": "Calcio femminile",
-      "available": 6,
-      "target": 2000,
-      "missing": 1994,
       "met": false
     },
     {
@@ -347,9 +371,9 @@
     {
       "group": "Categorie aggiuntive",
       "category": "Europei",
-      "available": 17,
+      "available": 113,
       "target": 2000,
-      "missing": 1983,
+      "missing": 1887,
       "met": false
     },
     {
@@ -366,6 +390,14 @@
       "available": 74,
       "target": 2000,
       "missing": 1926,
+      "met": false
+    },
+    {
+      "group": "Categorie aggiuntive",
+      "category": "Stadi famosi",
+      "available": 122,
+      "target": 2000,
+      "missing": 1878,
       "met": false
     },
     {
