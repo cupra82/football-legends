@@ -41,6 +41,26 @@ function discoveredClubs(bindings,country){
  }
  return [...result.values()];
 }
+// Selezione equa fra paesi: ogni gruppo fornisce un candidato a turno.
+// Se disponibile, il numero di sitelink Wikipedia favorisce club ben documentati.
+function rankCandidates(clubs,limit=240,preferSitelinks=false){
+ const groups=new Map();
+ for(const c of clubs){const key=c.country||'Altro';if(!groups.has(key))groups.set(key,[]);groups.get(key).push(c)}
+ for(const xs of groups.values())xs.sort((a,b)=>preferSitelinks?(Number(b.sitelinks||0)-Number(a.sitelinks||0))||a.id.localeCompare(b.id):a.id.localeCompare(b.id));
+ const names=[...groups.keys()].sort(),out=[];
+ while(out.length<limit){let progressed=false;for(const n of names){const c=groups.get(n).shift();if(c){out.push(c);progressed=true;if(out.length===limit)break}}if(!progressed)break}
+ return out;
+}
+function enrichmentQuery(clubs){
+ const ids=clubs.filter(c=>/^Q\d+$/.test(c.id)).map(c=>'wd:'+c.id);
+ if(!ids.length)return 'SELECT ?club ?sitelinks WHERE { VALUES ?club { wd:Q1422 } OPTIONAL { ?club wikibase:sitelinks ?sitelinks. } } LIMIT 1';
+ return `SELECT ?club ?sitelinks WHERE { VALUES ?club { ${ids.join(' ')} } OPTIONAL { ?club wikibase:sitelinks ?sitelinks. } }`;
+}
+function applySitelinks(clubs,bindings){
+ const byId=new Map(clubs.map(c=>[c.id,c]));
+ for(const r of bindings){const id=String(r.club?.value||'').split('/').pop();const c=byId.get(id);const v=Number(r.sitelinks?.value);if(c&&Number.isFinite(v)&&v>=0)c.sitelinks=v}
+ return clubs;
+}
 const sha=s=>crypto.createHash('sha256').update(s).digest('hex').slice(0,16);
 const norm=s=>String(s||'').normalize('NFKC').toLocaleLowerCase('it').replace(/[^\p{L}\p{N}]+/gu,' ').trim();
 const valid=s=>typeof s==='string'&&s.length>=3&&s.length<=75&&!/^Q\d+$/.test(s)&&!/[<>\[\]{}]/.test(s);
@@ -90,7 +110,8 @@ function makeQuestions(collection){
   const nearYears=years.filter(y=>y!==p.year&&Math.abs(y-p.year)>=2&&Math.abs(y-p.year)<=15).map(String);
   // Fatti di carriera relativi a club scoperti, non soltanto a squadre famose.
   if(clubs.length){
-   const alternatives=order([...new Set(collection.map(x=>x.club.name))],p.id+'clubs');
+   const owned=new Set(clubs.map(c=>norm(c.name)));
+   const alternatives=order([...new Set(collection.map(x=>x.club.name))].filter(n=>!owned.has(norm(n))),p.id+'clubs');
    add(p,club,'Carriere Wikidata',`In quale squadra ha giocato ${p.name} secondo Wikidata?`,club.name,alternatives,`${p.name} risulta aver giocato nel ${club.name}.`,2);
   }
   add(p,club,'Biografie Wikidata',`In quale anno è nato ${p.name} ${context}?`,String(p.year),nearYears,`${sourceText} è nato nel ${p.year}.`);
@@ -99,4 +120,4 @@ function makeQuestions(collection){
  }
  return questions;
 }
-module.exports={COUNTRIES,CLUBS,discoverCountriesQuery,discoveredCountries,discoverQuery,discoveredClubs,queryFor,rowsFrom,makeQuestions};
+module.exports={COUNTRIES,CLUBS,rankCandidates,enrichmentQuery,applySitelinks,discoverCountriesQuery,discoveredCountries,discoverQuery,discoveredClubs,queryFor,rowsFrom,makeQuestions};

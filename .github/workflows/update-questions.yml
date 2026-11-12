@@ -15,6 +15,7 @@ jobs:
         with:
           node-version: '22'
       - run: npm install --ignore-scripts
+      - run: node scripts/test-wikidata-priority.js
       - run: node test-almanac.js
       - run: node scripts/build-bank.js
       - name: Genera domande su calciatori e allenatori
